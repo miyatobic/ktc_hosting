@@ -1,41 +1,9 @@
-        function showManual(type) {
-            document.getElementById('mainMenu').style.display = 'none';
-            document.getElementById('customerManual').style.display = type === 'customer' ? 'block' : 'none';
-            document.getElementById('revenueManual').style.display = type === 'revenue' ? 'block' : 'none';
-            document.getElementById('invoiceManual').style.display = type === 'invoice' ? 'block' : 'none';
-            document.getElementById('glossaryManual').style.display = type === 'glossary' ? 'block' : 'none';
-            
-            // 첫 번째 스텝으로 초기화
-            if (type === 'customer') {
-                showStep('customer', 'step1');
-            } else if (type === 'revenue') {
-                showStep('revenue', 'step1');
-            } else if (type === 'invoice') {
-                showStep('invoice', 'step1');
-            } else if (type === 'glossary') {
-                showGlossaryTerm('t-code');
-            }
-        }
-
-        function showGlossary(term) {
-            showManual('glossary');
-            showGlossaryTerm(term);
-        }
-
-        function showGlossaryTerm(term) {
-            // 모든 용어 설명 숨기기
-            const terms = document.querySelectorAll('#glossaryManual .term-content');
-            terms.forEach(termDiv => termDiv.style.display = 'none');
-            
-            // 선택된 용어 보이기
-            const selectedTerm = document.getElementById(`glossary-${term}`);
-            if (selectedTerm) {
-                selectedTerm.<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAP ERP 청구 시스템 Interactive 매뉴얼</title>
+    <title>kt cloud ERP 통합 매뉴얼</title>
     <style>
         * {
             margin: 0;
@@ -44,10 +12,11 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Noto Sans KR', sans-serif;
+            line-height: 1.6;
+            color: #333;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            color: #333;
         }
         
         .container {
@@ -57,227 +26,334 @@
         }
         
         .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
             text-align: center;
-            margin-bottom: 40px;
-            color: white;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
         
         .header h1 {
+            color: #e60012;
             font-size: 2.5rem;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-weight: 700;
         }
         
         .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-        
-        .main-menu {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-        
-        .menu-card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: 3px solid transparent;
-        }
-        
-        .menu-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-            border-color: #667eea;
-        }
-        
-        .menu-card h3 {
-            color: #667eea;
-            font-size: 1.5rem;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .menu-card .icon {
-            margin-right: 10px;
-            font-size: 1.8rem;
-        }
-        
-        .menu-card ul {
-            list-style: none;
-            margin-left: 20px;
-        }
-        
-        .menu-card li {
-            margin: 8px 0;
             color: #666;
-            font-size: 0.95rem;
+            font-size: 1.1rem;
         }
         
-        .menu-card li:before {
-            content: "▶";
-            color: #667eea;
-            margin-right: 8px;
+        .search-container {
+            margin: 20px 0;
         }
         
-        .manual-content {
+        .search-container input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e60012;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+        }
+        
+        .search-results {
             display: none;
             background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 10px;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
         }
         
-        .manual-header {
-            background: linear-gradient(90deg, #667eea, #764ba2);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .manual-header h2 {
-            font-size: 1.5rem;
-        }
-        
-        .back-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
+        .search-result {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
             cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .search-result:hover {
+            background: #f8f9fa;
+        }
+        
+        .search-result h4 {
+            color: #e60012;
+            margin-bottom: 5px;
+        }
+        
+        .main-content {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .sidebar h3 {
+            color: #e60012;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .sidebar ul {
+            list-style: none;
+        }
+        
+        .sidebar > ul > li {
+            margin-bottom: 10px;
+        }
+        
+        .sidebar > ul > li > a {
+            color: #333;
+            text-decoration: none;
+            font-weight: 600;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 8px;
             transition: all 0.3s ease;
         }
         
-        .back-btn:hover {
-            background: rgba(255,255,255,0.3);
+        .sidebar > ul > li > a:hover {
+            background: #e60012;
+            color: white;
         }
         
-        .manual-body {
-            display: flex;
+        .sidebar ul ul {
+            margin-left: 15px;
+            margin-top: 5px;
+        }
+        
+        .sidebar ul ul li {
+            margin-bottom: 3px;
+        }
+        
+        .sidebar ul ul a {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar ul ul a:hover {
+            background: #f0f0f0;
+            color: #e60012;
+        }
+        
+        .content-area {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             min-height: 600px;
         }
         
-        .manual-nav {
-            width: 250px;
-            background: #f8f9fa;
-            border-right: 1px solid #e9ecef;
-            padding: 0;
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
         }
         
-        .manual-nav ul {
-            list-style: none;
+        .section.active {
+            display: block;
         }
         
-        .manual-nav li {
-            border-bottom: 1px solid #e9ecef;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        .manual-nav button {
-            width: 100%;
-            padding: 15px 20px;
-            border: none;
-            background: none;
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.9rem;
-        }
-        
-        .manual-nav button:hover {
-            background: #e9ecef;
-        }
-        
-        .manual-nav button.active {
-            background: #667eea;
-            color: white;
-        }
-        
-        .manual-detail {
-            flex: 1;
+        .section h2 {
+            color: #e60012;
+            font-size: 2rem;
+            margin-bottom: 25px;
             display: flex;
+            align-items: center;
+            gap: 15px;
         }
         
-        .manual-description {
-            width: 40%;
-            padding: 30px;
+        .step-number {
+            background: #e60012;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .substep {
             background: #f8f9fa;
-            border-right: 1px solid #e9ecef;
+            border-left: 4px solid #e60012;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 0 10px 10px 0;
+            transition: all 0.3s ease;
         }
         
-        .manual-description h3 {
-            color: #667eea;
-            margin-bottom: 20px;
+        .substep:hover {
+            background: #e8f4ff;
+            transform: translateX(10px);
+        }
+        
+        .substep h3 {
+            color: #e60012;
+            margin-bottom: 15px;
             font-size: 1.3rem;
         }
         
-        .manual-description p {
-            line-height: 1.6;
-            margin-bottom: 15px;
-            color: #555;
+        .field-list {
+            list-style: none;
+            padding: 15px 0;
         }
         
-        .manual-description ul {
-            margin-left: 20px;
-            color: #555;
-        }
-        
-        .manual-description li {
+        .field-list li {
+            background: rgba(230, 0, 18, 0.1);
             margin: 8px 0;
-            line-height: 1.5;
-        }
-        
-        .manual-screen {
-            width: 60%;
-            padding: 30px;
-            background: white;
-        }
-        
-        .sap-screen {
-            border: 2px solid #ccc;
+            padding: 12px 20px;
             border-radius: 8px;
-            overflow: hidden;
-            background: #f0f0f0;
+            border-left: 3px solid #e60012;
+            transition: all 0.3s ease;
         }
         
-        .sap-header {
-            background: #0070f3;
-            color: white;
-            padding: 8px 15px;
-            font-size: 0.9rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .field-list li:hover {
+            background: rgba(230, 0, 18, 0.2);
+            transform: translateX(5px);
         }
         
-        .sap-toolbar {
-            background: #e8e8e8;
-            padding: 8px 15px;
-            border-bottom: 1px solid #ccc;
-            display: flex;
-            gap: 10px;
+        .highlight {
+            background: linear-gradient(120deg, #ffd700 0%, #ffed4e 100%);
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-weight: 600;
         }
         
-        .sap-toolbar button {
-            padding: 4px 8px;
-            border: 1px solid #999;
-            background: white;
-            font-size: 0.8rem;
+        .code {
+            background: #2d3748;
+            color: #68d391;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
             cursor: pointer;
         }
         
-        .sap-content {
+        .code:hover {
+            background: #4a5568;
+        }
+        
+        .warning {
+            background: linear-gradient(135deg, #ff9a56 0%, #ff6b6b 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        .info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .tax-codes {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .tax-code {
+            background: linear-gradient(135deg, #55a3ff 0%, #003d82 100%);
+            color: white;
             padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .tax-code:hover {
+            transform: scale(1.05);
+        }
+        
+        .tax-code h4 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .payment-schedule {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
             background: white;
-            min-height: 300px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 15px;
+        }
+        
+        .payment-table th,
+        .payment-table td {
+            padding: 12px;
+            text-align: center;
+            color: #333;
+        }
+        
+        .payment-table th {
+            background: #e60012;
+            color: white;
+        }
+        
+        .term-link {
+            color: #667eea;
+            text-decoration: underline;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .term-link:hover {
+            color: #764ba2;
+            text-decoration: none;
+        }
+        
+        .bpm-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .bpm-section h4 {
+            color: #856404;
+            margin-bottom: 10px;
         }
         
         .form-group {
@@ -299,6 +375,30 @@
             font-size: 0.9rem;
         }
         
+        .sap-screen {
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f0f0f0;
+            margin: 15px 0;
+        }
+        
+        .sap-header {
+            background: #0070f3;
+            color: white;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sap-content {
+            padding: 20px;
+            background: white;
+            min-height: 200px;
+        }
+        
         .highlight-box {
             border: 2px dashed #ff6b6b;
             background: rgba(255, 107, 107, 0.1);
@@ -307,97 +407,14 @@
             border-radius: 5px;
         }
         
-        .step-number {
-            background: #667eea;
-            color: white;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            margin-right: 10px;
-        }
-        
-        .section-divider {
-            border-top: 2px solid #e9ecef;
-            margin: 20px 0;
-            padding-top: 20px;
-        }
-        
-        .bpm-section {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 5px;
-            padding: 15px;
-            margin: 15px 0;
-        }
-        
-        .bpm-section h4 {
-            color: #856404;
-            margin-bottom: 10px;
-        }
-
-        /* 용어 링크 스타일 */
-        .term-link {
-            color: #667eea;
-            text-decoration: underline;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .term-link:hover {
-            color: #764ba2;
-            text-decoration: none;
-        }
-
-        .term-content {
-            animation: fadeInUp 0.5s ease-out;
-        }
-
-        /* 노출된 JavaScript 코드 숨기기 */
-        body > script {
-            display: none !important;
-        }
-
-        /* 페이지 상단/하단의 불필요한 텍스트 숨기기 */
-        body::before,
-        body::after {
-            display: none !important;
-        }
-
-        /* 텍스트 노드로 노출되는 코드 숨기기 */
-        .code-leak {
-            display: none !important;
-            visibility: hidden !important;
-            height: 0 !important;
-            overflow: hidden !important;
-            position: absolute !important;
-            left: -9999px !important;
-        }
-
-        /* 반응형 스타일 */
         @media (max-width: 768px) {
-            .main-menu {
-                grid-template-columns: 1fr;
-            }
-            
-            .manual-body {
+            .main-content {
                 flex-direction: column;
             }
             
-            .manual-nav {
+            .sidebar {
                 width: 100%;
-            }
-            
-            .manual-detail {
-                flex-direction: column;
-            }
-            
-            .manual-description,
-            .manual-screen {
-                width: 100%;
+                position: static;
             }
             
             .header h1 {
@@ -413,180 +430,84 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🔧 SAP ERP 청구 시스템</h1>
-            <p>Interactive 매뉴얼 - 초보자도 쉽게 따라하는 단계별 가이드</p>
-        </div>
-        
-        <div id="mainMenu" class="main-menu">
-            <div class="menu-card" onclick="showManual('customer')">
-                <h3><span class="icon">👥</span>고객처 등록</h3>
-                <ul>
-                    <li>프로그램 실행 및 기본정보 입력</li>
-                    <li>고객정보 입력 (신청내역, 기본정보, 세무정보)</li>
-                    <li>재무정보 및 주소 작성</li>
-                    <li>BPM 승인 처리</li>
-                </ul>
-            </div>
+            <h1>🏢 kt cloud ERP 통합 매뉴얼</h1>
+            <p>SAP ERP 시스템을 활용한 매출/비용 전표 처리 완전 가이드</p>
             
-            <div class="menu-card" onclick="showManual('revenue')">
-                <h3><span class="icon">📝</span>수입전표 입력</h3>
-                <ul>
-                    <li>프로그램 실행 및 기본정보 입력</li>
-                    <li>청구내용 입력 (송장처리일, 금액, 세액)</li>
-                    <li>매출정보 입력 (G/L계정, 코스트센터)</li>
-                    <li>결재요청 및 BPM 승인</li>
-                </ul>
-            </div>
-            
-            <div class="menu-card" onclick="showManual('invoice')">
-                <h3><span class="icon">🧾</span>ERP 청구서 발행</h3>
-                <ul>
-                    <li>발행정보 조회</li>
-                    <li>청구서 재발송</li>
-                    <li>청구서 PDF 다운로드</li>
-                    <li>이메일 발송 관리</li>
-                </ul>
-            </div>
-
-            <div class="menu-card" onclick="showManual('glossary')" style="grid-column: span 3;">
-                <h3><span class="icon">📚</span>용어 설명</h3>
-                <ul>
-                    <li>SAP 시스템 주요 용어 정리</li>
-                    <li>회계 관련 용어 설명</li>
-                    <li>프로세스 관련 용어 해설</li>
-                </ul>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="매뉴얼 검색 (예: 전표 생성, 세금코드, BPM 등)">
+                <div id="searchResults" class="search-results"></div>
             </div>
         </div>
         
-        <!-- 고객처 등록 매뉴얼 -->
-        <div id="customerManual" class="manual-content">
-            <div class="manual-header">
-                <h2>👥 고객처 등록 (ZFIRE4090)</h2>
-                <button class="back-btn" onclick="showMainMenu()">← 메인으로</button>
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>📋 매뉴얼 목차</h3>
+                <ul>
+                    <li>
+                        <a href="#" onclick="showSection('revenue-overview')">📈 매출 전표</a>
+                        <ul>
+                            <li><a href="#" onclick="showSection('customer-registration')">고객처 등록</a></li>
+                            <li><a href="#" onclick="showSection('revenue-entry')">수입전표 입력</a></li>
+                            <li><a href="#" onclick="showSection('invoice-issue')">ERP 청구서 발행</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#" onclick="showSection('expense-overview')">📉 비용 전표</a>
+                        <ul>
+                            <li><a href="#" onclick="showSection('vendor-registration')">구매처 등록</a></li>
+                            <li><a href="#" onclick="showSection('expense-with-tax')">지출전표 입력(세금계산서)</a></li>
+                            <li><a href="#" onclick="showSection('expense-without-tax')">지출전표 입력(세금계산서X)</a></li>
+                            <li><a href="#" onclick="showSection('foreign-expense')">외화 지출전표 입력</a></li>
+                            <li><a href="#" onclick="showSection('advance-payment')">선급금 전표 입력</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#" onclick="showSection('glossary')">📚 용어설명</a></li>
+                    <li><a href="#" onclick="showSection('faq')">❓ FAQ</a></li>
+                </ul>
             </div>
-            <div class="manual-body">
-                <div class="manual-nav">
-                    <ul>
-                        <li><button class="active" onclick="showStep('customer', 'step1')">1. 프로그램 실행</button></li>
-                        <li><button onclick="showStep('customer', 'step2')">2. 신청내역 작성</button></li>
-                        <li><button onclick="showStep('customer', 'step3')">3. 기본정보 작성</button></li>
-                        <li><button onclick="showStep('customer', 'step4')">4. 세무정보 작성</button></li>
-                        <li><button onclick="showStep('customer', 'step5')">5. 재무정보 작성</button></li>
-                        <li><button onclick="showStep('customer', 'step6')">6. 주소 기재</button></li>
-                        <li><button onclick="showStep('customer', 'step7')">7. BPM 승인</button></li>
-                    </ul>
-                </div>
-                <div class="manual-detail">
-                    <div class="manual-description">
-                        <div id="customer-step1" class="step-content">
-                            <h3><span class="step-number">1</span>프로그램 실행</h3>
-                            <p>SAP에서 고객 마스터를 생성하거나 변경하는 프로그램입니다.</p>
-                            <ul>
-                                <li>SAP 왼쪽 상단에 <a href="#" onclick="showGlossary('t-code')" class="term-link">t-code</a> <strong>ZFIRE4090</strong> 입력</li>
-                                <li>Enter 키를 눌러 프로그램 실행</li>
-                                <li>작업 유형을 선택한 후 요청자 입력</li>
-                            </ul>
-                            <p><strong>주의사항:</strong> <a href="#" onclick="showGlossary('t-code')" class="term-link">t-code</a>는 정확히 입력해야 합니다.</p>
-                        </div>
+            
+            <div class="content-area">
+                <!-- 매출 전표 개요 -->
+                <div id="revenue-overview" class="section active">
+                    <h2><span class="step-number">📈</span>매출 전표 개요</h2>
+                    <div class="substep">
+                        <h3>🎯 매출 전표 처리 프로세스</h3>
+                        <p>매출 전표는 회사의 수익을 인식하고 고객에게 청구서를 발행하는 과정입니다.</p>
+                        <ul class="field-list">
+                            <li><span class="highlight">1단계</span>: 고객처 등록 - 새로운 고객 정보를 시스템에 등록</li>
+                            <li><span class="highlight">2단계</span>: 수입전표 입력 - 매출 발생에 대한 전표 작성</li>
+                            <li><span class="highlight">3단계</span>: ERP 청구서 발행 - 고객에게 청구서 발송</li>
+                        </ul>
                         
-                        <div id="customer-step2" class="step-content" style="display:none;">
-                            <h3><span class="step-number">2</span>신청내역 작성</h3>
-                            <p>고객 등록을 위한 신청 사유를 입력합니다.</p>
-                            <ul>
-                                <li>신청 사유를 구체적으로 작성</li>
-                                <li>등록 목적과 배경 설명</li>
-                                <li>필요시 추가 설명 기재</li>
-                            </ul>
-                            <p><strong>팁:</strong> 신청사유는 구체적으로 작성하면 승인이 빨라집니다.</p>
-                        </div>
-                        
-                        <div id="customer-step3" class="step-content" style="display:none;">
-                            <h3><span class="step-number">3</span>기본정보 작성</h3>
-                            <p>고객의 기본 정보를 입력합니다.</p>
-                            <ul>
-                                <li><strong>계정그룹:</strong> 고객 유형에 맞는 계정그룹 선택</li>
-                                <li><strong>고객명:</strong> 정식 회사명 또는 고객명 입력</li>
-                                <li><strong>고객단축명:</strong> 시스템에서 사용할 단축명 입력</li>
-                            </ul>
-                            <p><strong>주의:</strong> 고객명은 사업자등록증과 일치해야 합니다.</p>
-                        </div>
-                        
-                        <div id="customer-step4" class="step-content" style="display:none;">
-                            <h3><span class="step-number">4</span>세무정보 작성</h3>
-                            <p>세무 처리를 위한 정보를 입력합니다.</p>
-                            <ul>
-                                <li><strong>사업자등록번호:</strong> 사업자등록증 상의 번호</li>
-                                <li><strong>대표자명:</strong> 사업자등록증 상의 대표자</li>
-                                <li><strong>업태:</strong> 사업자등록증 상의 업태</li>
-                                <li><strong>업종:</strong> 사업자등록증 상의 업종</li>
-                            </ul>
-                            <p><strong>필수서류:</strong> 사업자등록증을 미리 준비해주세요.</p>
-                            <p>입력 완료 후 <strong>BPM결재요청</strong> 버튼을 클릭합니다.</p>
-                        </div>
-                        
-                        <div id="customer-step5" class="step-content" style="display:none;">
-                            <h3><span class="step-number">5</span>재무정보 작성</h3>
-                            <p>결제 관련 정보를 입력합니다.</p>
-                            <ul>
-                                <li><strong>지급조건:</strong> 결제 조건 선택</li>
-                                <li><strong>가상계좌은행:</strong> 신한은행(088) 지정</li>
-                            </ul>
-                            <p><strong>참고:</strong> 가상계좌는 시스템에서 자동 생성됩니다.</p>
-                        </div>
-                        
-                        <div id="customer-step6" class="step-content" style="display:none;">
-                            <h3><span class="step-number">6</span>주소 기재</h3>
-                            <p>고객의 주소 및 연락처 정보를 입력합니다.</p>
-                            <ul>
-                                <li><strong>주소 검색:</strong> 우편번호 검색으로 정확한 주소 입력</li>
-                                <li><strong>연락처 정보:</strong>
-                                    <ul>
-                                        <li>전화번호</li>
-                                        <li>E-mail 주소</li>
-                                    </ul>
-                                </li>
-                                <li><strong>청구지 주소:</strong> 주소 검색으로 청구서 발송 주소 입력</li>
-                            </ul>
-                            <p>모든 정보 입력 완료 후 <strong>BPM 요청</strong>을 진행합니다.</p>
-                        </div>
-                        
-                        <div id="customer-step7" class="step-content" style="display:none;">
-                            <h3><span class="step-number">7</span>BPM 승인</h3>
-                            <div class="bpm-section">
-                                <h4>📋 BPM 승인 절차</h4>
-                                <ul>
-                                    <li><strong>1단계:</strong> 입력정보 확인</li>
-                                    <li><strong>2단계:</strong> 증빙서류 첨부
-                                        <ul>
-                                            <li>사업자등록증</li>
-                                            <li>개인정보 수집이용동의서</li>
-                                            <li>법인인감증명서</li>
-                                            <li>구매처 등록서류 (해당시)</li>
-                                        </ul>
-                                    </li>
-                                    <li><strong>3단계:</strong> 업무처리 클릭하여 승인 요청</li>
-                                </ul>
-                            </div>
-                            <p><strong>승인 경로:</strong> 재무회계팀에서 최종 승인 처리됩니다.</p>
+                        <div class="info">
+                            💡 <strong>주요 특징</strong><br>
+                            • 자동 세금계산서 발행<br>
+                            • 실시간 매출 인식<br>
+                            • 통합 고객 관리<br>
+                            • BPM 승인 워크플로우
                         </div>
                     </div>
+                </div>
+                
+                <!-- 고객처 등록 -->
+                <div id="customer-registration" class="section">
+                    <h2><span class="step-number">👥</span>고객처 등록 (ZFIRE4090)</h2>
                     
-                    <div class="manual-screen">
+                    <div class="substep">
+                        <h3>🔧 프로그램 실행</h3>
+                        <p><strong>SAP에서 고객 마스터를 생성하거나 변경하는 프로그램입니다.</strong></p>
+                        <ul class="field-list">
+                            <li>SAP 왼쪽 상단에 <a href="#" onclick="showGlossary('t-code')" class="term-link">t-code</a> <span class="code">ZFIRE4090</span> 입력</li>
+                            <li>Enter 키를 눌러 프로그램 실행</li>
+                            <li>작업 유형을 선택한 후 요청자 입력</li>
+                        </ul>
+                        
                         <div class="sap-screen">
                             <div class="sap-header">
                                 <span>고객 마스터 생성/변경 프로그램</span>
                                 <span>ZFIRE4090</span>
                             </div>
-                            <div class="sap-toolbar">
-                                <button>시스템</button>
-                                <button>편집</button>
-                                <button>이동</button>
-                                <button>즐겨찾기</button>
-                                <button>도구</button>
-                                <button>시스템</button>
-                                <button>도움말</button>
-                            </div>
-                            <div class="sap-content" id="customer-screen">
+                            <div class="sap-content">
                                 <div class="highlight-box">
                                     <div class="form-group">
                                         <label>작업선택:</label>
@@ -600,1005 +521,1001 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <label>요청자:</label>
-                                    <input type="text" placeholder="요청자명 입력">
-                                </div>
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="substep">
+                        <h3>📝 기본정보 작성</h3>
+                        <ul class="field-list">
+                            <li><span class="highlight">계정그룹:</span> 고객 유형에 맞는 계정그룹 선택</li>
+                            <li><span class="highlight">고객명:</span> 정식 회사명 또는 고객명 입력</li>
+                            <li><span class="highlight">고객단축명:</span> 시스템에서 사용할 단축명 입력</li>
+                        </ul>
+                        
+                        <div class="warning">
+                            ⚠️ <strong>주의</strong><br>
+                            고객명은 사업자등록증과 일치해야 합니다.
+                        </div>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>🏛️ 세무정보 작성</h3>
+                        <ul class="field-list">
+                            <li><span class="highlight">사업자등록번호:</span> 사업자등록증 상의 번호</li>
+                            <li><span class="highlight">대표자명:</span> 사업자등록증 상의 대표자</li>
+                            <li><span class="highlight">업태:</span> 사업자등록증 상의 업태</li>
+                            <li><span class="highlight">업종:</span> 사업자등록증 상의 업종</li>
+                        </ul>
+                        
+                        <div class="bmp-section">
+                            <h4>📋 BPM 승인 절차</h4>
+                            <ul>
+                                <li><strong>1단계:</strong> 입력정보 확인</li>
+                                <li><strong>2단계:</strong> 증빙서류 첨부 (사업자등록증, 개인정보 수집이용동의서 등)</li>
+                                <li><strong>3단계:</strong> 업무처리 클릭하여 승인 요청</li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- 수입전표 입력 매뉴얼 -->
-        <div id="revenueManual" class="manual-content">
-            <div class="manual-header">
-                <h2>📝 수입전표 입력 (ZFIRE4110)</h2>
-                <button class="back-btn" onclick="showMainMenu()">← 메인으로</button>
-            </div>
-            <div class="manual-body">
-                <div class="manual-nav">
-                    <ul>
-                        <li><button class="active" onclick="showStep('revenue', 'step1')">1. 프로그램 실행</button></li>
-                        <li><button onclick="showStep('revenue', 'step2')">2. 청구방식 설정</button></li>
-                        <li><button onclick="showStep('revenue', 'step3')">3. 청구내용 입력</button></li>
-                        <li><button onclick="showStep('revenue', 'step4')">4. 매출정보 입력</button></li>
-                        <li><button onclick="showStep('revenue', 'step5')">5. 결재요청</button></li>
-                    </ul>
-                </div>
-                <div class="manual-detail">
-                    <div class="manual-description">
-                        <div id="revenue-step1" class="step-content">
-                            <h3><span class="step-number">1</span>프로그램 실행</h3>
-                            <p>수입전표를 입력하여 매출을 등록하는 프로그램입니다.</p>
-                            <ul>
-                                <li>SAP 왼쪽 상단에 <a href="#" onclick="showGlossary('t-code')" class="term-link">t-code</a> <strong>ZFIRE4110</strong> 입력</li>
-                                <li>Enter 키를 눌러 프로그램 실행</li>
-                                <li>고객사업자번호 입력</li>
-                                <li>전표헤더 텍스트 한줄 작성</li>
-                            </ul>
-                            <p><strong>주의:</strong> 고객사업자번호는 정확히 입력해야 합니다.</p>
-                        </div>
-                        
-                        <div id="revenue-step2" class="step-content" style="display:none;">
-                            <h3><span class="step-number">2</span>청구방식 설정</h3>
-                            <p>청구 유형과 채권 유형을 선택합니다.</p>
-                            <ul>
-                                <li><strong>개별항목 선택:</strong>
-                                    <ul>
-                                        <li>매월청구수입전표-정기</li>
-                                        <li>1회 청구수입전표-수기</li>
-                                    </ul>
-                                </li>
-                                <li><strong>채권유형:</strong>
-                                    <ul>
-                                        <li>기본: 영업수익</li>
-                                        <li>영업수익이 아닐 경우: "영업외수익" 선택</li>
-                                    </ul>
-                                </li>
-                            </ul>
-                            <p>설정 완료 후 <strong>실행</strong> 버튼을 클릭합니다.</p>
-                            <p><strong>참고:</strong> 선수금은 별도 문의 필요합니다.</p>
-                        </div>
-                        
-                        <div id="revenue-step3" class="step-content" style="display:none;">
-                            <h3><span class="step-number">3</span>청구내용 입력</h3>
-                            <p>세금계산서 발행을 위한 상세 정보를 입력합니다.</p>
-                            <ul>
-                                <li><strong>송장 처리일:</strong> 세금계산서 발행일(작성일) 입력
-                                    <ul><li>⚠️ 입력일 기준 전월 일자 입력 금지</li></ul>
-                                </li>
-                                <li><strong>금액:</strong> VAT 포함 금액 입력</li>
-                                <li><strong>세액:</strong> VAT 입력
-                                    <ul><li>면세일 경우 우측 세금코드 변경</li></ul>
-                                </li>
-                                <li><strong>텍스트:</strong> 청구 내용 상세 설명</li>
-                            </ul>
-                            <p><strong>참고:</strong> 송장 처리일은 <a href="#" onclick="showGlossary('증빙일')" class="term-link">증빙일</a>과 동일합니다.</p>
-                        </div>
-                        
-                        <div id="revenue-step4" class="step-content" style="display:none;">
-                            <h3><span class="step-number">4</span>매출정보 입력</h3>
-                            <p>회계 처리를 위한 상세 정보를 입력합니다.</p>
-                            <ul>
-                                <li><strong><a href="#" onclick="showGlossary('gl계정')" class="term-link">G/L계정</a>:</strong> 적정계정 입력
-                                    <ul><li>문의: 경영재무팀 (예산은 경영성과팀)</li></ul>
-                                </li>
-                                <li><strong>전표 통화 표시금액:</strong> 매출금액(VAT제외)</li>
-                                <li><strong><a href="#" onclick="showGlossary('코스트센터')" class="term-link">코스트센터</a>:</strong> 예산 매핑된 코스트센터</li>
-                                <li><strong><a href="#" onclick="showGlossary('wbs')" class="term-link">WBS</a>:</strong> 필요시 입력</li>
-                                <li><strong><a href="#" onclick="showGlossary('수익성세그먼트')" class="term-link">수익성세그먼트</a>:</strong> 관련 BM에 맞는 세그먼트</li>
-                            </ul>
-                            <p>입력 완료 후 <strong>시뮬레이션</strong>으로 확인 → <strong>완료 상태로 저장</strong></p>
-                        </div>
-                        
-                        <div id="revenue-step5" class="step-content" style="display:none;">
-                            <h3><span class="step-number">5</span>결재요청</h3>
-                            <p>ZFIRE0092 프로그램을 통해 결재를 요청합니다.</p>
-                            <div class="bpm-section">
-                                <h4>📋 결재요청 절차</h4>
-                                <ul>
-                                    <li><strong>1단계:</strong> ZFIRE0092 실행</li>
-                                    <li><strong>2단계:</strong> 전표입력 일자 범위 설정</li>
-                                    <li><strong>3단계:</strong> 실행 버튼 클릭</li>
-                                    <li><strong>4단계:</strong> 상세적요 입력 버튼 클릭</li>
-                                    <li><strong>5단계:</strong> 가산금 부과 정보 입력 버튼 클릭 (해당시)</li>
-                                    <li><strong>6단계:</strong> BPM 결재요청</li>
+                
+                <!-- 수입전표 입력 -->
+                <div id="revenue-entry" class="section">
+                    <h2><span class="step-number">📝</span>수입전표 입력 (ZFIRE4110)</h2>
+                    
+                    <div class="substep">
+                        <h3>🚀 프로그램 실행</h3>
+                        <p><strong>수입전표를 입력하여 매출을 등록하는 프로그램입니다.</strong></p>
+                        <ul class="field-list">
+                            <li>SAP 왼쪽 상단에 <a href="#" onclick="showGlossary('t-code')" class="term-link">t-code</a> <span class="code">ZFIRE4110</span> 입력</li>
+                            <li>Enter 키를 눌러 프로그램 실행</li>
+                            <li>고객사업자번호 입력</li>
+                            <li>전표헤더 텍스트 한줄 작성</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>⚙️ 청구방식 설정</h3>
+                        <p><strong>청구 유형과 채권 유형을 선택합니다.</strong></p>
+                        <ul class="field-list">
+                            <li><strong>개별항목 선택:</strong>
+                                <ul style="margin-left: 20px; margin-top: 5px;">
+                                    <li>매월청구수입전표-정기</li>
+                                    <li>1회 청구수입전표-수기</li>
                                 </ul>
-                            </div>
-                            <p><strong>승인:</strong> 전결기준에 따라 적정 증빙 첨부하여 결재</p>
+                            </li>
+                            <li><strong>채권유형:</strong>
+                                <ul style="margin-left: 20px; margin-top: 5px;">
+                                    <li>기본: 영업수익</li>
+                                    <li>영업수익이 아닐 경우: "영업외수익" 선택</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        
+                        <div class="info">
+                            💡 선수금은 별도 문의 필요합니다.
                         </div>
                     </div>
                     
-                    <div class="manual-screen">
-                        <div class="sap-screen">
-                            <div class="sap-header">
-                                <span>수입전표 입력</span>
-                                <span>ZFIRE4110</span>
-                            </div>
-                            <div class="sap-toolbar">
-                                <button>프로그램</button>
-                                <button>편집</button>
-                                <button>이동</button>
-                                <button>추가</button>
-                                <button>유틸리티</button>
-                                <button>시스템</button>
-                                <button>도움말</button>
-                            </div>
-                            <div class="sap-content" id="revenue-screen">
-                                <div class="highlight-box">
-                                    <div class="form-group">
-                                        <label>사업자번호:</label>
-                                        <input type="text" placeholder="전표헤더 텍스트 한줄 작성">
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>전기일:</label>
-                                    <input type="date" id="currentDate1">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- ERP 청구서 발행 매뉴얼 -->
-        <div id="invoiceManual" class="manual-content">
-            <div class="manual-header">
-                <h2>🧾 ERP 청구서 발행 (ZFIRE4130)</h2>
-                <button class="back-btn" onclick="showMainMenu()">← 메인으로</button>
-            </div>
-            <div class="manual-body">
-                <div class="manual-nav">
-                    <ul>
-                        <li><button class="active" onclick="showStep('invoice', 'step1')">1. 프로그램 실행</button></li>
-                        <li><button onclick="showStep('invoice', 'step2')">2. 발행정보 조회</button></li>
-                        <li><button onclick="showStep('invoice', 'step3')">3. 청구서 재발송</button></li>
-                        <li><button onclick="showStep('invoice', 'step4')">4. PDF 다운로드</button></li>
-                    </ul>
-                </div>
-                <div class="manual-detail">
-                    <div class="manual-description">
-                        <div id="invoice-step1" class="step-content">
-                            <h3><span class="step-number">1</span>프로그램 실행</h3>
-                            <p>발생된 수익에 대한 청구서를 발행하고 관리하는 프로그램입니다.</p>
-                            <ul>
-                                <li>SAP 왼쪽 상단에 <a href="#" onclick="showGlossary('t-code')" class="term-link">t-code</a> <strong>ZFIRE4130</strong> 입력</li>
-                                <li>Enter 키를 눌러 프로그램 실행</li>
-                                <li>고객코드 입력</li>
-                                <li>실행버튼 클릭하여 청구서 정보 조회</li>
-                            </ul>
-                            <p><strong>기능:</strong> 발행정보 조회, 청구서 재발송, PDF 다운로드 가능</p>
-                        </div>
+                    <div class="substep">
+                        <h3>💰 청구내용 입력</h3>
+                        <ul class="field-list">
+                            <li><span class="highlight">송장 처리일:</span> 세금계산서 발행일(작성일) 입력</li>
+                            <li><span class="highlight">금액:</span> VAT 포함 금액 입력</li>
+                            <li><span class="highlight">세액:</span> VAT 입력 (면세일 경우 우측 세금코드 변경)</li>
+                            <li><span class="highlight">텍스트:</span> 청구 내용 상세 설명</li>
+                        </ul>
                         
-                        <div id="invoice-step2" class="step-content" style="display:none;">
-                            <h3><span class="step-number">2</span>발행정보 조회</h3>
-                            <p>고객별 청구서 발행 현황을 조회할 수 있습니다.</p>
-                            <ul>
-                                <li><strong>조회 정보:</strong>
-                                    <ul>
-                                        <li>전표번호</li>
-                                        <li>청구 금액</li>
-                                        <li>발행일자</li>
-                                        <li>청구서 상태</li>
-                                    </ul>
-                                </li>
-                                <li><strong>필터 옵션:</strong>
-                                    <ul>
-                                        <li>발행기간 설정</li>
-                                        <li>청구서 상태별 조회</li>
-                                        <li>금액별 정렬</li>
-                                    </ul>
-                                </li>
-                            </ul>
-                            <p><strong>활용:</strong> 청구서 발행 이력 관리 및 상태 확인</p>
-                        </div>
-                        
-                        <div id="invoice-step3" class="step-content" style="display:none;">
-                            <h3><span class="step-number">3</span>청구서 재발송</h3>
-                            <p>이미 발행된 청구서를 다시 고객에게 전송할 수 있습니다.</p>
-                            <ul>
-                                <li><strong>재발송 절차:</strong>
-                                    <ul>
-                                        <li>발행된 청구서 목록에서 선택</li>
-                                        <li>"이메일청구서발송" 버튼 클릭</li>
-                                        <li>수신 이메일 주소 확인</li>
-                                        <li>발송 버튼 클릭</li>
-                                    </ul>
-                                </li>
-                                <li><strong>주의사항:</strong>
-                                    <ul>
-                                        <li>고객 정보의 이메일 주소가 정확한지 확인</li>
-                                        <li>중복 발송 주의</li>
-                                    </ul>
-                                </li>
-                            </ul>
-                            <p><strong>팁:</strong> 발송 전 이메일 주소를 다시 한번 확인해주세요.</p>
-                        </div>
-                        
-                        <div id="invoice-step4" class="step-content" style="display:none;">
-                            <h3><span class="step-number">4</span>PDF 다운로드</h3>
-                            <p>청구서를 PDF 파일로 다운로드하여 보관하거나 별도 전송할 수 있습니다.</p>
-                            <ul>
-                                <li><strong>다운로드 절차:</strong>
-                                    <ul>
-                                        <li>청구서 목록에서 원하는 항목 선택</li>
-                                        <li>"청구서 발행" 버튼 클릭</li>
-                                        <li>"PDF파일 다운로드" 버튼 클릭</li>
-                                        <li>파일 저장 위치 선택</li>
-                                    </ul>
-                                </li>
-                                <li><strong>활용 방법:</strong>
-                                    <ul>
-                                        <li>내부 보고용 자료</li>
-                                        <li>고객 요청시 별도 전송</li>
-                                        <li>회계 증빙 보관</li>
-                                    </ul>
-                                </li>
-                            </ul>
-                            <p><strong>참고:</strong> PDF 파일은 정식 청구서와 동일한 효력을 가집니다.</p>
+                        <div class="warning">
+                            ⚠️ <strong>중요</strong><br>
+                            입력일 기준 전월 일자 입력 금지
                         </div>
                     </div>
                     
-                    <div class="manual-screen">
-                        <div class="sap-screen">
-                            <div class="sap-header">
-                                <span>ERP 발생수익 청구서 발행</span>
-                                <span>ZFIRE4130</span>
-                            </div>
-                            <div class="sap-toolbar">
-                                <button>프로그램</button>
-                                <button>편집</button>
-                                <button>이동</button>
-                                <button>시스템</button>
-                                <button>도움말</button>
-                            </div>
-                            <div class="sap-content" id="invoice-screen">
-                                <div class="highlight-box">
-                                    <div class="form-group">
-                                        <label>고객코드:</label>
-                                        <input type="text" placeholder="고객코드 입력">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>조회:</label>
-                                        <button style="padding: 8px 16px; background: #0070f3; color: white; border: none; border-radius: 4px;">실행</button>
-                                    </div>
-                                </div>
-                                <div class="section-divider">
-                                    <h4>발행 조회 선택</h4>
-                                    <div class="form-group">
-                                        <input type="radio" name="query_type" value="sales" checked>
-                                        <label>영업수익 청구</label>
-                                    </div>
-                                    <div class="form-group">
-                                        <input type="radio" name="query_type" value="nonsales">
-                                        <label>영업외 청구</label>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>청구서 발송일자:</label>
-                                        <input type="date" id="invoiceDate">
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="substep">
+                        <h3>📊 매출정보 입력</h3>
+                        <ul class="field-list">
+                            <li><span class="highlight"><a href="#" onclick="showGlossary('gl계정')" class="term-link">G/L계정</a>:</span> 적정계정 입력 (문의: 경영재무팀)</li>
+                            <li><span class="highlight">전표 통화 표시금액:</span> 매출금액(VAT제외)</li>
+                            <li><span class="highlight"><a href="#" onclick="showGlossary('코스트센터')" class="term-link">코스트센터</a>:</span> 예산 매핑된 코스트센터</li>
+                            <li><span class="highlight"><a href="#" onclick="showGlossary('wbs')" class="term-link">WBS</a>:</span> 필요시 입력</li>
+                            <li><span class="highlight"><a href="#" onclick="showGlossary('수익성세그먼트')" class="term-link">수익성세그먼트</a>:</span> 관련 BM에 맞는 세그먼트</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- ERP 청구서 발행 -->
+                <div id="invoice-issue" class="section">
+                    <h2><span class="step-number">🧾</span>ERP 청구서 발행 (ZFIRE4130)</h2>
+                    
+                    <div class="substep">
+                        <h3>🚀 프로그램 실행</h3>
+                        <p><strong>발생된 수익에 대한 청구서를 발행하고 관리하는 프로그램입니다.</strong></p>
+                        <ul class="field-list">
+                            <li>SAP 왼쪽 상단에 <a href="#" onclick="showGlossary('t-code')" class="term-link">t-code</a> <span class="code">ZFIRE4130</span> 입력</li>
+                            <li>Enter 키를 눌러 프로그램 실행</li>
+                            <li>고객코드 입력</li>
+                            <li>실행버튼 클릭하여 청구서 정보 조회</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>📊 발행정보 조회</h3>
+                        <p><strong>고객별 청구서 발행 현황을 조회할 수 있습니다.</strong></p>
+                        <ul class="field-list">
+                            <li><strong>조회 정보:</strong> 전표번호, 청구 금액, 발행일자, 청구서 상태</li>
+                            <li><strong>필터 옵션:</strong> 발행기간 설정, 청구서 상태별 조회, 금액별 정렬</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>📧 청구서 재발송</h3>
+                        <p><strong>이미 발행된 청구서를 다시 고객에게 전송할 수 있습니다.</strong></p>
+                        <ul class="field-list">
+                            <li>발행된 청구서 목록에서 선택</li>
+                            <li>"이메일청구서발송" 버튼 클릭</li>
+                            <li>수신 이메일 주소 확인</li>
+                            <li>발송 버튼 클릭</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>📄 PDF 다운로드</h3>
+                        <p><strong>청구서를 PDF 파일로 다운로드하여 보관하거나 별도 전송할 수 있습니다.</strong></p>
+                        <ul class="field-list">
+                            <li>청구서 목록에서 원하는 항목 선택</li>
+                            <li>"청구서 발행" 버튼 클릭</li>
+                            <li>"PDF파일 다운로드" 버튼 클릭</li>
+                            <li>파일 저장 위치 선택</li>
+                        </ul>
+                        
+                        <div class="info">
+                            💡 PDF 파일은 정식 청구서와 동일한 효력을 가집니다.
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        <!-- 용어 설명 매뉴얼 -->
-        <div id="glossaryManual" class="manual-content">
-            <div class="manual-header">
-                <h2>📚 용어 설명</h2>
-                <button class="back-btn" onclick="showMainMenu()">← 메인으로</button>
-            </div>
-            <div class="manual-body">
-                <div class="manual-nav">
-                    <ul>
-                        <li><button class="active" onclick="showGlossaryTerm('t-code')">t-code</button></li>
-                        <li><button onclick="showGlossaryTerm('gl계정')">G/L계정</button></li>
-                        <li><button onclick="showGlossaryTerm('코스트센터')">코스트센터</button></li>
-                        <li><button onclick="showGlossaryTerm('수익성세그먼트')">수익성세그먼트</button></li>
-                        <li><button onclick="showGlossaryTerm('wbs')">WBS</button></li>
-                        <li><button onclick="showGlossaryTerm('전기일')">전기일</button></li>
-                        <li><button onclick="showGlossaryTerm('증빙일')">증빙일</button></li>
-                    </ul>
+                
+                <!-- 비용 전표 개요 -->
+                <div id="expense-overview" class="section">
+                    <h2><span class="step-number">📉</span>비용 전표 개요</h2>
+                    <div class="substep">
+                        <h3>🎯 비용 전표 처리 프로세스</h3>
+                        <p>비용 전표는 회사에서 발생하는 각종 지출을 처리하고 관리하는 과정입니다.</p>
+                        <ul class="field-list">
+                            <li><span class="highlight">1단계</span>: 구매처 등록 - 새로운 공급업체 정보를 시스템에 등록</li>
+                            <li><span class="highlight">2단계</span>: 지출전표 입력 - 비용 발생에 대한 전표 작성</li>
+                            <li><span class="highlight">3단계</span>: BPM 결재 요청 - 승인 워크플로우 진행</li>
+                        </ul>
+                        
+                        <div class="info">
+                            💡 <strong>주요 특징</strong><br>
+                            • 세금계산서 연동 처리<br>
+                            • 다양한 세금코드 지원<br>
+                            • 외화 지출 처리<br>
+                            • 선급금 관리
+                        </div>
+                    </div>
                 </div>
-                <div class="manual-detail">
-                    <div class="manual-description" style="width: 100%;">
-                        <div id="glossary-t-code" class="term-content">
-                            <h3><span class="step-number">T</span>t-code</h3>
-                            <p><strong>정의:</strong> SAP 시스템에서 특정 기능/화면으로 바로 이동하기 위해 사용하는 단축코드</p>
-                            <ul>
-                                <li><strong>사용방법:</strong> SAP 화면 좌측상단 박스에 입력 후 Enter</li>
-                                <li><strong>예시:</strong> ZFIRE4090, ZFIRE4110, ZFIRE4130</li>
-                                <li><strong>특징:</strong> 각 t-code는 고유한 기능을 가지고 있음</li>
-                                <li><strong>장점:</strong> 메뉴를 통해 이동하는 것보다 빠르고 효율적</li>
-                            </ul>
-                            <div class="bmp-section">
-                                <h4>💡 사용 팁</h4>
-                                <p>자주 사용하는 t-code는 즐겨찾기에 등록하여 더욱 빠르게 접근할 수 있습니다.</p>
+                
+                <!-- 구매처 등록 -->
+                <div id="vendor-registration" class="section">
+                    <h2><span class="step-number">🏪</span>구매처 등록</h2>
+                    
+                    <div class="substep">
+                        <h3>🔧 국내 구매처 등록</h3>
+                        <p><strong>국내 공급업체를 시스템에 등록하는 과정입니다.</strong></p>
+                        <ul class="field-list">
+                            <li>구매처 마스터 생성 메뉴 접속</li>
+                            <li>사업자등록번호 입력</li>
+                            <li>업체명, 대표자명 입력</li>
+                            <li>주소, 연락처 정보 입력</li>
+                            <li>은행계좌 정보 등록</li>
+                        </ul>
+                        
+                        <div class="warning">
+                            ⚠️ <strong>필수 서류</strong><br>
+                            사업자등록증, 통장사본, 법인인감증명서
+                        </div>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>🌐 외화 구매처 등록 (ZFIRR6100)</h3>
+                        <p><strong>해외 공급업체를 등록할 때 사용하는 프로세스입니다.</strong></p>
+                        <ul class="field-list">
+                            <li><span class="highlight">계정그룹:</span> 해당하는 사업자 유형 선택</li>
+                            <li><span class="highlight">국가코드:</span> 해당 국가 선택</li>
+                            <li><span class="highlight">사업자유형:</span> 12(외국기업) 선택</li>
+                            <li><span class="highlight">은행정보:</span>
+                                <ul style="margin-left: 20px; margin-top: 5px;">
+                                    <li>국가코드: KR 외 선택</li>
+                                    <li>은행코드: 997 (해외은행) 선택</li>
+                                    <li>계좌번호: 인보이스 등에 기재된 계좌번호</li>
+                                </ul>
+                            </li>
+                        </ul>
+                        
+                        <div class="info">
+                            💡 해당 서류가 없을 경우 담당부서에 대체가능한 서류 문의 (예: 인보이스 등)
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 지출전표 입력 (세금계산서) -->
+                <div id="expense-with-tax" class="section">
+                    <h2><span class="step-number">📋</span>지출전표 입력 (세금계산서)</h2>
+                    
+                    <div class="substep">
+                        <h3>🔍 전자세금계산서 조회 (ZEVRR0040)</h3>
+                        <p><strong>먼저 전자세금계산서가 있는지 확인합니다.</strong></p>
+                        <ul class="field-list">
+                            <li><span class="highlight">사업자등록번호</span> 또는 <span class="highlight">공급받는자 이메일</span> 입력</li>
+                            <li>조회 버튼 클릭하여 세금계산서 확인</li>
+                            <li>전표 미작성 건에 대해 전표 발행 진행</li>
+                        </ul>
+                        
+                        <div class="info">
+                            💡 증빙(세금계산서, 계산서)가 없는 경우, 바로 임시전표 생성(FV60)부터 진행
+                        </div>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>📝 지급 전표 생성 (FV60)</h3>
+                        <p><strong>T-Code: FV60 - AP 임시진표 입력</strong></p>
+                        
+                        <h4>🔸 기본 정보 입력</h4>
+                        <ul class="field-list">
+                            <li><span class="highlight">공급업체:</span> 구매처 마스터에 등록된 공급업체 번호</li>
+                            <li><span class="highlight">송장 처리일:</span> 세금계산서/계산서 발행일</li>
+                            <li><span class="highlight">전기일:</span> 장부 반영일</li>
+                            <li><span class="highlight">금액:</span> 총 금액 (부가세 포함)</li>
+                            <li><span class="highlight">세액:</span> 부가세 금액</li>
+                            <li><span class="highlight">사업장:</span> <span class="code">0000</span></li>
+                        </ul>
+                        
+                        <h4>🔸 세금코드 선택</h4>
+                        <div class="tax-codes">
+                            <div class="tax-code">
+                                <h4>J2</h4>
+                                <p>세금계산서가 있는 일반 과세 비용</p>
+                            </div>
+                            <div class="tax-code">
+                                <h4>L4</h4>
+                                <p>세금계산서가 있는 접대비, 업무추진비<br>(세액 금액을 0원으로 처리)</p>
+                            </div>
+                            <div class="tax-code">
+                                <h4>R1</h4>
+                                <p>계산서가 있는 면세 비용</p>
+                            </div>
+                            <div class="tax-code">
+                                <h4>Z5</h4>
+                                <p>세금계산서, 계산서가 없는 비용</p>
                             </div>
                         </div>
                         
-                        <div id="glossary-gl계정" class="term-content" style="display:none;">
-                            <h3><span class="step-number">G</span>G/L계정</h3>
-                            <p><strong>정의:</strong> SAP 시스템에 입력되어 있는 회계 계정으로, 총계정원장(General Ledger)의 약자</p>
-                            <ul>
-                                <li><strong>용도:</strong> 회계 거래의 분류 및 기록</li>
-                                <li><strong>구성:</strong> 숫자로 이루어진 계정 코드</li>
-                                <li><strong>예시:</strong> 매출계정, 비용계정, 자산계정 등</li>
-                                <li><strong>문의처:</strong> 경영재무팀 (예산 관련은 경영성과팀)</li>
-                            </ul>
-                            <div class="bmp-section">
-                                <h4>💡 주의사항</h4>
-                                <p>잘못된 G/L계정 입력시 회계 처리에 오류가 발생할 수 있으므로 반드시 확인 후 입력해야 합니다.</p>
-                            </div>
+                        <h4>🔸 비용 계정 및 센터 정보</h4>
+                        <ul class="field-list">
+                            <li><span class="highlight">G/L 계정:</span> 비용 계정과목 선택</li>
+                            <li><span class="highlight">코스트센터:</span> 기안자 소속 부서</li>
+                            <li><span class="highlight">손익센터:</span> 코스트센터 입력 후 자동 설정</li>
+                            <li><span class="highlight">텍스트:</span> 비용항목 적요 내역</li>
+                            <li><span class="highlight">수익성세그먼트:</span> 직접비 사용시 BM(L4) 필수</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>💰 지급 조건 설정</h3>
+                        
+                        <div class="payment-schedule">
+                            <h4>📅 대가 지급일 기준</h4>
+                            <table class="payment-table">
+                                <thead>
+                                    <tr>
+                                        <th>세금계산서 발행일</th>
+                                        <th>대가 지급일</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1~10일</td>
+                                        <td>당월 24일</td>
+                                    </tr>
+                                    <tr>
+                                        <td>11~20일</td>
+                                        <td>익월 4일</td>
+                                    </tr>
+                                    <tr>
+                                        <td>21~말일</td>
+                                        <td>익월 14일</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                         
-                        <div id="glossary-코스트센터" class="term-content" style="display:none;">
-                            <h3><span class="step-number">C</span>코스트센터</h3>
-                            <p><strong>정의:</strong> 손익계정 구분을 위해 부여한 부서 고유번호</p>
-                            <ul>
-                                <li><strong>목적:</strong> 예산관리와 BM별 손익구분</li>
-                                <li><strong>특징:</strong> 각 부서마다 고유한 번호 할당</li>
-                                <li><strong>활용:</strong> 비용 배분 및 성과 측정</li>
-                                <li><strong>필수성:</strong> 예산 관리를 위해 필수적인 정보</li>
-                            </ul>
-                            <div class="bmp-section">
-                                <h4>💡 참고</h4>
-                                <p>코스트센터는 예산과 매핑되어 있어야 하며, 잘못 입력시 예산 관리에 문제가 발생할 수 있습니다.</p>
-                            </div>
-                        </div>
+                        <ul class="field-list">
+                            <li><span class="highlight">지급조건:</span> <span class="code">1000</span> (현금 지급 기준)</li>
+                            <li><span class="highlight">파트너은행:</span> 구매처 지급 은행 선택</li>
+                        </ul>
                         
-                        <div id="glossary-수익성세그먼트" class="term-content" style="display:none;">
-                            <h3><span class="step-number">P</span>수익성세그먼트</h3>
-                            <p><strong>정의:</strong> 회계 계정보다 상세한 BM정보를 구분하기 위해 입력하는 정보</p>
-                            <ul>
-                                <li><strong>상세도:</strong> BM L5까지 구분됨</li>
-                                <li><strong>용도:</strong> 세밀한 수익성 분석</li>
-                                <li><strong>활용:</strong> 사업부문별 성과 측정</li>
-                                <li><strong>연계:</strong> 관련 BM에 맞는 세그먼트 선택 필요</li>
-                            </ul>
-                            <div class="bmp-section">
-                                <h4>💡 활용 방안</h4>
-                                <p>수익성세그먼트를 통해 각 사업 영역별 수익성을 정확히 파악하고 전략적 의사결정에 활용할 수 있습니다.</p>
-                            </div>
+                        <div class="warning">
+                            ⚠️ <strong>중요</strong><br>
+                            세금계산서 발행일로부터 7일 이내 전표처리 완료 필요<br>
+                            지연 시 지출 결의 +7일 이후 도래하는 대가 지급일 적용
                         </div>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>✅ 시뮬레이션 및 저장</h3>
+                        <ul class="field-list">
+                            <li>시뮬레이션 클릭하여 작성내용 검토</li>
+                            <li>완료 상태로 저장 선택</li>
+                            <li>하단 계좌 정보 확인 후 엔터</li>
+                            <li>임시저장 완료 확인</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>📨 BPM 결재 요청 (ZFIRE0092)</h3>
+                        <p><strong>T-Code: ZFIRE0092 - 결재 요청</strong></p>
+                        <ul class="field-list">
+                            <li><span class="highlight">회사코드:</span> <span class="code">1000</span></li>
+                            <li><span class="highlight">기안 기간:</span> 조회할 기간 입력 후 실행</li>
+                            <li>결재 요청할 전표 선택</li>
+                            <li>상세 적요 입력</li>
+                            <li>BPM 결재 요청 버튼 클릭</li>
+                        </ul>
                         
-                        <div id="glossary-wbs" class="term-content" style="display:none;">
-                            <h3><span class="step-number">W</span>WBS</h3>
-                            <p><strong>정의:</strong> 프로젝트에 해당되는 별도 예산관리를 위해 부여되는 고유번호</p>
+                        <div class="bpm-section">
+                            <h4>📋 BPM 기안 작성</h4>
                             <ul>
-                                <li><strong>풀네임:</strong> Work Breakdown Structure</li>
-                                <li><strong>용도:</strong> 프로젝트별 예산 및 비용 관리</li>
-                                <li><strong>특징:</strong> 각 프로젝트마다 고유한 WBS 할당</li>
-                                <li><strong>입력시점:</strong> 프로젝트 관련 거래시에만 필요</li>
+                                <li><strong>첨부파일:</strong> 기안 문서에 필요한 증빙 자료 첨부</li>
+                                <li><strong>결재선 지정:</strong> 지출 전결기준에 따른 결재선 지정</li>
+                                <li><strong>물품구매여부:</strong> 해당없음/선장품/업무용 용품 중 선택</li>
+                                <li><strong>업무처리:</strong> BPM 기안 상신</li>
                             </ul>
-                            <div class="bmp-section">
-                                <h4>💡 사용 예시</h4>
-                                <p>대규모 시스템 구축 프로젝트나 컨설팅 프로젝트 등에서 별도 예산 관리가 필요한 경우 사용합니다.</p>
-                            </div>
                         </div>
+                    </div>
+                </div>
+                
+                <!-- 지출전표 입력 (세금계산서 없음) -->
+                <div id="expense-without-tax" class="section">
+                    <h2><span class="step-number">📄</span>지출전표 입력 (세금계산서 없음)</h2>
+                    
+                    <div class="substep">
+                        <h3>📝 임시전표 생성 (FV60)</h3>
+                        <p><strong>세금계산서나 계산서가 없는 경우의 전표 처리입니다.</strong></p>
+                        <ul class="field-list">
+                            <li><span class="highlight">세금코드:</span> <span class="code">Z5</span> (세금계산서, 계산서가 없는 비용)</li>
+                            <li><span class="highlight">적용 케이스:</span>
+                                <ul style="margin-left: 20px; margin-top: 5px;">
+                                    <li>교통비, 숙박비</li>
+                                    <li>회의비, 식대</li>
+                                    <li>기타 간이영수증 등</li>
+                                </ul>
+                            </li>
+                        </ul>
                         
-                        <div id="glossary-전기일" class="term-content" style="display:none;">
-                            <h3><span class="step-number">P</span>전기일</h3>
-                            <p><strong>정의:</strong> 회계상 인식되는 일자</p>
-                            <ul>
-                                <li><strong>용도:</strong> 회계 기간 구분 및 재무제표 작성</li>
-                                <li><strong>특징:</strong> 실제 거래일과 다를 수 있음</li>
-                                <li><strong>영향:</strong> 손익 인식 시점 결정</li>
-                                <li><strong>관리:</strong> 회계 정책에 따라 설정</li>
-                            </ul>
-                            <div class="bmp-section">
-                                <h4>💡 중요성</h4>
-                                <p>전기일은 회계 기간의 정확한 손익 계산을 위해 매우 중요한 요소입니다.</p>
-                            </div>
+                        <div class="warning">
+                            ⚠️ <strong>주의사항</strong><br>
+                            세금계산서가 없는 경우에도 적절한 증빙서류(영수증, 카드매출전표 등)가 필요합니다.
                         </div>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>📋 전표 조회 및 수정 (FBV2)</h3>
+                        <p><strong>T-Code: FBV2 - 임시 전표 조회</strong></p>
                         
-                        <div id="glossary-증빙일" class="term-content" style="display:none;">
-                            <h3><span class="step-number">D</span>증빙일</h3>
-                            <p><strong>정의:</strong> 세무상 인식되는 일자로, 세금계산서 상 작성일과 동일</p>
-                            <ul>
-                                <li><strong>기준:</strong> 세금계산서 작성일</li>
-                                <li><strong>용도:</strong> 세무신고 및 부가세 신고</li>
-                                <li><strong>중요성:</strong> 정확한 세무 처리를 위해 필수</li>
-                                <li><strong>주의사항:</strong> 전기일과 구분하여 관리</li>
-                            </ul>
-                            <div class="bmp-section">
-                                <h4>💡 구분점</h4>
-                                <p>전기일은 회계상, 증빙일은 세무상 기준으로 각각 다른 목적을 가지고 있습니다.</p>
+                        <h4>📋 방법 1: 전표 번호를 알고 있는 경우</h4>
+                        <ul class="field-list">
+                            <li>전표 번호 직접 입력</li>
+                            <li>상단 체크박스 클릭하여 조회</li>
+                        </ul>
+                        
+                        <h4>📋 방법 2: 전표 번호를 모르는 경우</h4>
+                        <ul class="field-list">
+                            <li>문서 리스트 조회 선택</li>
+                            <li>검색조건 설정 후 조회 (미설정시 전체 조회)</li>
+                            <li>조회할 전표 더블 클릭</li>
+                        </ul>
+                        
+                        <div class="info">
+                            💡 BPM 결재 상신 전까지만 수정 가능<br>
+                            결재 상신 후에는 BPM 취소 후 수정 필요
+                        </div>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>🔄 합산전표 생성 (ZTRRE0150)</h3>
+                        <p><strong>여러 개의 전표를 하나의 기안문으로 작성하고 싶을 때 사용</strong></p>
+                        <ul class="field-list">
+                            <li>조회할 전표의 전기일 입력</li>
+                            <li>전표작성자 사번 입력</li>
+                            <li>실행하여 전표 목록 조회</li>
+                            <li>합산할 전표들 선택</li>
+                            <li>합산처리 및 적요 입력</li>
+                            <li>합산전표 확인 후 BPM 결재요청</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 외화 지출전표 입력 -->
+                <div id="foreign-expense" class="section">
+                    <h2><span class="step-number">💱</span>외화 지출전표 입력</h2>
+                    
+                    <div class="substep">
+                        <h3>🔧 지출전표 작성 (FV60)</h3>
+                        <p><strong>외화로 지급하는 비용에 대한 전표 처리입니다.</strong></p>
+                        <ul class="field-list">
+                            <li><span class="highlight">공급업체:</span> 지급 대상업체 입력</li>
+                            <li><span class="highlight">송장 처리일 = 전기일:</span> 세금계산서 발행일</li>
+                            <li><span class="highlight">지급통화로 변경:</span> USD, JPY 등</li>
+                            <li><span class="highlight">금액:</span> 지급통화에 맞게 작성 (원화 환산금액 X)</li>
+                            <li><span class="highlight">세금코드:</span> Z5</li>
+                            <li><span class="highlight">텍스트:</span> 지급목적, 내용 등 작성</li>
+                        </ul>
+                        
+                        <div class="warning">
+                            ⚠️ <strong>외화 지급 특이사항</strong><br>
+                            • 외화는 매월 말 지급처리<br>
+                            • 지급방법: D<br>
+                            • 지급조건: 9000번 사용
+                        </div>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>📊 세부내용 작성</h3>
+                        <ul class="field-list">
+                            <li><span class="highlight">G/L계정:</span> 안내받은 계정 기재</li>
+                            <li><span class="highlight">전표 통화 표시 금액:</span> 외화 금액과 동일</li>
+                            <li><span class="highlight">텍스트, 코스트센터, 수익성세그먼트:</span> 기재</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>🏦 지급 설정</h3>
+                        <ul class="field-list">
+                            <li><span class="highlight">지급조건:</span> 9000번, 만기일이 해당 달의 말일이 될 수 있도록 일수 수정</li>
+                            <li><span class="highlight">지급방법:</span> D</li>
+                            <li><span class="highlight">파트너은행:</span> 지정 (칸 오른편 버튼 클릭하여 은행 지정)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>📨 지출결의 상신 (ZFIRE0092)</h3>
+                        <ul class="field-list">
+                            <li>대상 전표 선택</li>
+                            <li>상세적요 입력 클릭</li>
+                            <li>지급대상, 목적, 금액 등 세부내용 작성</li>
+                            <li>BPM 결재요청 클릭</li>
+                        </ul>
+                        
+                        <div class="info">
+                            💡 결재선: 원화환산금액 기준 지출전결과 동일<br>
+                            인보이스, 계약서 등 증빙서류 첨부 후 결재상신
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 선급금 전표 입력 -->
+                <div id="advance-payment" class="section">
+                    <h2><span class="step-number">💰</span>선급금 전표 입력</h2>
+                    
+                    <div class="substep">
+                        <h3>🔧 선급금 전표 작성 (F-43)</h3>
+                        <p><strong>미리 지급하는 금액에 대한 전표 처리입니다.</strong></p>
+                        <ul class="field-list">
+                            <li><span class="highlight">T-Code:</span> <span class="code">F-43</span> 입력 (선지급시 선급금 전표 작성)</li>
+                            <li><span class="highlight">G/L계정:</span> 선급금_기타 (<span class="code">114018000</span>)</li>
+                            <li><span class="highlight">지급조건:</span> 1000 또는 1500 입력 (지급기산일 입력 X)</li>
+                        </ul>
+                        
+                        <div class="info">
+                            💡 선급금은 나중에 실제 비용 발생시 정산처리됩니다.
+                        </div>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>📋 세금계산서 연동</h3>
+                        <p><strong>세금계산서 발행 후 매핑하여 전표 작성하는 경우</strong></p>
+                        <ul class="field-list">
+                            <li><span class="highlight">T-Code:</span> <span class="code">ZEVRR0040</span> (세금계산서 조회)</li>
+                            <li>세금계산서 발행 후 세금계산서 매핑하여 전표 작성</li>
+                            <li>전표 발행 진행</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>⚙️ 파트너은행 설정</h3>
+                        <ul class="field-list">
+                            <li>파트너은행 입력은 상단 추가데이터 메뉴에서 입력</li>
+                            <li>각 행을 선택하면 수정 화면으로 넘어감</li>
+                            <li>수정화면에서 다시 뒤로가기 버튼을 누르면 이전 화면으로</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>💾 저장 및 승인</h3>
+                        <ul class="field-list">
+                            <li>전표 메뉴에서 완료상태로 저장</li>
+                            <li><span class="code">ZFIRE0092</span> T-CODE 입력하여 BPM 승인</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- 용어설명 -->
+                <div id="glossary" class="section">
+                    <h2><span class="step-number">📚</span>용어 설명</h2>
+                    
+                    <div class="substep" id="glossary-t-code">
+                        <h3><span class="step-number">T</span>t-code</h3>
+                        <p><strong>정의:</strong> SAP 시스템에서 특정 기능/화면으로 바로 이동하기 위해 사용하는 단축코드</p>
+                        <ul class="field-list">
+                            <li><strong>사용방법:</strong> SAP 화면 좌측상단 박스에 입력 후 Enter</li>
+                            <li><strong>예시:</strong> ZFIRE4090, ZFIRE4110, ZFIRE4130</li>
+                            <li><strong>특징:</strong> 각 t-code는 고유한 기능을 가지고 있음</li>
+                            <li><strong>장점:</strong> 메뉴를 통해 이동하는 것보다 빠르고 효율적</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep" id="glossary-gl계정">
+                        <h3><span class="step-number">G</span>G/L계정</h3>
+                        <p><strong>정의:</strong> SAP 시스템에 입력되어 있는 회계 계정으로, 총계정원장(General Ledger)의 약자</p>
+                        <ul class="field-list">
+                            <li><strong>용도:</strong> 회계 거래의 분류 및 기록</li>
+                            <li><strong>구성:</strong> 숫자로 이루어진 계정 코드</li>
+                            <li><strong>예시:</strong> 매출계정, 비용계정, 자산계정 등</li>
+                            <li><strong>문의처:</strong> 경영재무팀 (예산 관련은 경영성과팀)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep" id="glossary-코스트센터">
+                        <h3><span class="step-number">C</span>코스트센터</h3>
+                        <p><strong>정의:</strong> 손익계정 구분을 위해 부여한 부서 고유번호</p>
+                        <ul class="field-list">
+                            <li><strong>목적:</strong> 예산관리와 BM별 손익구분</li>
+                            <li><strong>특징:</strong> 각 부서마다 고유한 번호 할당</li>
+                            <li><strong>활용:</strong> 비용 배분 및 성과 측정</li>
+                            <li><strong>필수성:</strong> 예산 관리를 위해 필수적인 정보</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep" id="glossary-수익성세그먼트">
+                        <h3><span class="step-number">P</span>수익성세그먼트</h3>
+                        <p><strong>정의:</strong> 회계 계정보다 상세한 BM정보를 구분하기 위해 입력하는 정보</p>
+                        <ul class="field-list">
+                            <li><strong>상세도:</strong> BM L5까지 구분됨</li>
+                            <li><strong>용도:</strong> 세밀한 수익성 분석</li>
+                            <li><strong>활용:</strong> 사업부문별 성과 측정</li>
+                            <li><strong>연계:</strong> 관련 BM에 맞는 세그먼트 선택 필요</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep" id="glossary-wbs">
+                        <h3><span class="step-number">W</span>WBS</h3>
+                        <p><strong>정의:</strong> 프로젝트에 해당되는 별도 예산관리를 위해 부여되는 고유번호</p>
+                        <ul class="field-list">
+                            <li><strong>풀네임:</strong> Work Breakdown Structure</li>
+                            <li><strong>용도:</strong> 프로젝트별 예산 및 비용 관리</li>
+                            <li><strong>특징:</strong> 각 프로젝트마다 고유한 WBS 할당</li>
+                            <li><strong>입력시점:</strong> 프로젝트 관련 거래시에만 필요</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep" id="glossary-전기일">
+                        <h3><span class="step-number">P</span>전기일</h3>
+                        <p><strong>정의:</strong> 회계상 인식되는 일자</p>
+                        <ul class="field-list">
+                            <li><strong>용도:</strong> 회계 기간 구분 및 재무제표 작성</li>
+                            <li><strong>특징:</strong> 실제 거래일과 다를 수 있음</li>
+                            <li><strong>영향:</strong> 손익 인식 시점 결정</li>
+                            <li><strong>관리:</strong> 회계 정책에 따라 설정</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep" id="glossary-증빙일">
+                        <h3><span class="step-number">D</span>증빙일</h3>
+                        <p><strong>정의:</strong> 세무상 인식되는 일자로, 세금계산서 상 작성일과 동일</p>
+                        <ul class="field-list">
+                            <li><strong>기준:</strong> 세금계산서 작성일</li>
+                            <li><strong>용도:</strong> 세무신고 및 부가세 신고</li>
+                            <li><strong>중요성:</strong> 정확한 세무 처리를 위해 필수</li>
+                            <li><strong>주의사항:</strong> 전기일과 구분하여 관리</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- FAQ -->
+                <div id="faq" class="section">
+                    <h2><span class="step-number">❓</span>자주 묻는 질문 (FAQ)</h2>
+                    
+                    <div class="substep">
+                        <h3>❓ "가용 예산이 부족하다고 뜹니다."</h3>
+                        <p><strong>해결방법:</strong> 예산은 경영성과팀 또는 본부 내 재원담당자에게 문의하시기 바랍니다.</p>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>❓ "CO 오브젝트가 필요합니다."</h3>
+                        <p><strong>해결방법:</strong> 코스트센터 입력이 누락된 경우입니다. 코스트센터를 입력하면 해결됩니다.</p>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>❓ "특정기간의 발생 손익의 경우 선급비용/선수수익계정을 사용하시기 바랍니다"</h3>
+                        <p><strong>해결방법:</strong> 장기간에 걸쳐 반영되어야 할 비용을 일시에 지출하는 경우, 선급비용 전표 생성이 필요합니다.</p>
+                        <p>일시에 반영되어야 할 비용이면 [ENTER] 후 넘어가시면 됩니다.</p>
+                        <div class="info">
+                            💡 <strong>예시:</strong> 1년치 임차비, 6개월 용역 대금 등을 하나의 세금계산서로 수령하여 일시에 지출하는 경우
+                        </div>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>❓ "전기는 제로잔액으로만 가능합니다; 전표를 수정하십시오"</h3>
+                        <p><strong>해결방법:</strong> FV60에서 금액은 "공급가액+세액=합계" 금액입니다.</p>
+                        <p><span class="highlight">전표 표시 통화금액(공급가액) + 세액 = 금액(합계)</span>가 되도록 전표 수정이 필요합니다.</p>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>❓ BPM 결재가 반려되었습니다. 어떻게 해야 하나요?</h3>
+                        <p><strong>해결방법:</strong></p>
+                        <ol style="list-style: decimal; margin-left: 20px; color: #333;">
+                            <li>먼저 BPM에서 취소 처리를 진행합니다</li>
+                            <li>SAP에서 임시전표를 수정합니다</li>
+                            <li>수정 완료 후 다시 BPM 결재 요청을 진행합니다</li>
+                        </ol>
+                        <div class="warning">
+                            ⚠️ BPM 취소 처리를 먼저 진행하지 않으면 임시전표 수정이 불가능합니다.
+                        </div>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>❓ 여러 전표를 하나의 결재로 올리고 싶습니다.</h3>
+                        <p><strong>해결방법:</strong> 합산전표 생성 기능(ZTRRE0150)을 사용하세요.</p>
+                        <ul class="field-list">
+                            <li>동일한 날짜에 작성된 여러 전표를 하나로 합산 가능</li>
+                            <li>합산 후 하나의 BPM 기안문으로 결재 요청</li>
+                            <li>결재 효율성 향상 및 업무 간소화 효과</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>❓ 외화 지급은 어떻게 처리하나요?</h3>
+                        <p><strong>해결방법:</strong> 외화 지급 전용 프로세스를 따라주세요.</p>
+                        <ul class="field-list">
+                            <li>지급통화를 USD, JPY 등으로 변경</li>
+                            <li>세금코드는 Z5 사용</li>
+                            <li>지급조건은 9000번 사용</li>
+                            <li>매월 말 지급처리됩니다</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>❓ 세금코드를 어떻게 선택해야 하나요?</h3>
+                        <p><strong>해결방법:</strong> 증빙 유형에 따라 다음과 같이 선택하세요.</p>
+                        <div class="tax-codes">
+                            <div class="tax-code">
+                                <h4>J2</h4>
+                                <p>세금계산서가 있는 일반 과세 비용</p>
+                            </div>
+                            <div class="tax-code">
+                                <h4>L4</h4>
+                                <p>접대비, 업무추진비<br>(세액을 0원으로 처리)</p>
+                            </div>
+                            <div class="tax-code">
+                                <h4>R1</h4>
+                                <p>계산서가 있는 면세 비용</p>
+                            </div>
+                            <div class="tax-code">
+                                <h4>Z5</h4>
+                                <p>증빙서류가 없는 비용</p>
                             </div>
                         </div>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>❓ SAP 접속이 안 됩니다.</h3>
+                        <p><strong>해결방법:</strong> 다음 단계를 확인해주세요.</p>
+                        <ul class="field-list">
+                            <li><strong>1단계:</strong> SAP가 설치되어 있는지 확인</li>
+                            <li><strong>2단계:</strong> 연결 설정 확인
+                                <ul style="margin-left: 20px; margin-top: 5px;">
+                                    <li>어플리케이션 서버: 10.221.43.48</li>
+                                    <li>인스턴스 번호: 00</li>
+                                    <li>시스템 ID: KCP</li>
+                                </ul>
+                            </li>
+                            <li><strong>3단계:</strong> 로그인 정보 확인 (사번 7자리, 개인 비밀번호)</li>
+                            <li><strong>4단계:</strong> 문제 지속시 IT 지원팀 문의</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="substep">
+                        <h3>❓ 전표 번호를 잊어버렸습니다.</h3>
+                        <p><strong>해결방법:</strong> FBV2에서 문서 리스트 조회를 사용하세요.</p>
+                        <ul class="field-list">
+                            <li>T-Code: <span class="code">FBV2</span> 입력</li>
+                            <li>"문서 리스트 조회" 선택</li>
+                            <li>검색조건 설정 (작성일, 금액 등)</li>
+                            <li>실행하여 전표 목록 확인</li>
+                            <li>해당 전표 더블클릭하여 상세 조회</li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+    
     <script>
-        // 현재 날짜 설정
-        function setCurrentDate() {
-            const today = new Date().toISOString().split('T')[0];
-            const dateInputs = document.querySelectorAll('input[type="date"]');
-            dateInputs.forEach(input => {
-                if (input.id === 'currentDate1' || input.id === 'invoiceDate') {
-                    input.value = today;
-                }
+        // 현재 활성화된 섹션
+        let currentSection = 'revenue-overview';
+        
+        // 섹션 표시 함수
+        function showSection(sectionId) {
+            // 모든 섹션 숨기기
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.remove('active');
             });
-        }
-
-        function showMainMenu() {
-            document.getElementById('mainMenu').style.display = 'grid';
-            document.getElementById('customerManual').style.display = 'none';
-            document.getElementById('revenueManual').style.display = 'none';
-            document.getElementById('invoiceManual').style.display = 'none';
-        }
-
-        function showManual(type) {
-            document.getElementById('mainMenu').style.display = 'none';
-            document.getElementById('customerManual').style.display = type === 'customer' ? 'block' : 'none';
-            document.getElementById('revenueManual').style.display = type === 'revenue' ? 'block' : 'none';
-            document.getElementById('invoiceManual').style.display = type === 'invoice' ? 'block' : 'none';
-            document.getElementById('glossaryManual').style.display = type === 'glossary' ? 'block' : 'none';
             
-            // 첫 번째 스텝으로 초기화
-            if (type === 'customer') {
-                showStep('customer', 'step1');
-            } else if (type === 'revenue') {
-                showStep('revenue', 'step1');
-            } else if (type === 'invoice') {
-                showStep('invoice', 'step1');
-            } else if (type === 'glossary') {
-                showGlossaryTerm('t-code');
+            // 선택된 섹션 보이기
+            const selectedSection = document.getElementById(sectionId);
+            if (selectedSection) {
+                selectedSection.classList.add('active');
+                currentSection = sectionId;
+            }
+            
+            // 사이드바 링크 활성화 상태 업데이트
+            updateSidebarActive(sectionId);
+            
+            // 상단으로 스크롤
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // 검색 결과 숨기기
+            const searchResults = document.getElementById('searchResults');
+            searchResults.style.display = 'none';
+        }
+        
+        // 사이드바 활성화 상태 업데이트
+        function updateSidebarActive(sectionId) {
+            const sidebarLinks = document.querySelectorAll('.sidebar a');
+            sidebarLinks.forEach(link => {
+                link.style.background = '';
+                link.style.color = '';
+            });
+            
+            // 해당 링크 찾아서 활성화
+            const targetLink = document.querySelector(`a[onclick="showSection('${sectionId}')"]`);
+            if (targetLink) {
+                targetLink.style.background = '#e60012';
+                targetLink.style.color = 'white';
             }
         }
-
+        
+        // 용어 설명으로 이동
         function showGlossary(term) {
-            showManual('glossary');
-            showGlossaryTerm(term);
+            showSection('glossary');
+            
+            // 해당 용어로 스크롤
+            setTimeout(() => {
+                const glossaryElement = document.getElementById(`glossary-${term}`);
+                if (glossaryElement) {
+                    glossaryElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    glossaryElement.style.background = '#fff3cd';
+                    setTimeout(() => {
+                        glossaryElement.style.background = '';
+                    }, 2000);
+                }
+            }, 300);
         }
-
-        function showGlossaryTerm(term) {
-            // 모든 용어 설명 숨기기
-            const terms = document.querySelectorAll('#glossaryManual .term-content');
-            terms.forEach(termDiv => termDiv.style.display = 'none');
+        
+        // 검색 기능
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const searchResults = document.getElementById('searchResults');
             
-            // 선택된 용어 보이기
-            const selectedTerm = document.getElementById(`glossary-${term}`);
-            if (selectedTerm) {
-                selectedTerm.style.display = 'block';
-            }
+            searchInput.addEventListener('input', function() {
+                const query = this.value.toLowerCase().trim();
+                if (query.length > 1) {
+                    performSearch(query);
+                } else {
+                    searchResults.style.display = 'none';
+                }
+            });
             
-            // 네비게이션 버튼 활성화 상태 변경
-            const buttons = document.querySelectorAll('#glossaryManual .manual-nav button');
-            buttons.forEach(btn => btn.classList.remove('active'));
-            
-            // 해당 용어 버튼 활성화
-            buttons.forEach(btn => {
-                if (btn.textContent.toLowerCase().includes(term.toLowerCase()) || 
-                    (term === 'gl계정' && btn.textContent.includes('G/L계정'))) {
-                    btn.classList.add('active');
+            // 검색 결과 외부 클릭시 숨기기
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.style.display = 'none';
                 }
             });
         }
-
-        function showStep(manualType, stepId) {
-            // 해당 매뉴얼의 모든 스텝 숨기기
-            const steps = document.querySelectorAll(`#${manualType}Manual .step-content`);
-            steps.forEach(step => step.style.display = 'none');
+        
+        // 검색 수행
+        function performSearch(query) {
+            const searchResults = document.getElementById('searchResults');
+            const allSections = document.querySelectorAll('.section');
+            const results = [];
             
-            // 선택된 스텝 보이기
-            const selectedStep = document.getElementById(`${manualType}-${stepId}`);
-            if (selectedStep) {
-                selectedStep.style.display = 'block';
-            }
-            
-            // 네비게이션 버튼 활성화 상태 변경
-            const buttons = document.querySelectorAll(`#${manualType}Manual .manual-nav button`);
-            buttons.forEach(btn => btn.classList.remove('active'));
-            
-            // 클릭된 버튼 활성화
-            event.target.classList.add('active');
-            
-            // 화면 내용 업데이트
-            updateScreen(manualType, stepId);
-        }
-
-        function updateScreen(manualType, stepId) {
-            const screenElement = document.getElementById(`${manualType}-screen`);
-            
-            if (manualType === 'customer') {
-                updateCustomerScreen(stepId, screenElement);
-            } else if (manualType === 'revenue') {
-                updateRevenueScreen(stepId, screenElement);
-            } else if (manualType === 'invoice') {
-                updateInvoiceScreen(stepId, screenElement);
-            }
-        }
-
-        function updateCustomerScreen(stepId, screenElement) {
-            const screens = {
-                'step1': `
-                    <div class="highlight-box">
-                        <div class="form-group">
-                            <label>작업선택:</label>
-                            <div style="margin-left: 10px;">
-                                <input type="radio" name="work_type" value="create" checked>
-                                <label style="margin-right: 15px;">생성요청</label>
-                                <input type="radio" name="work_type" value="change">
-                                <label style="margin-right: 15px;">변경/보류해제</label>
-                                <input type="radio" name="work_type" value="hold">
-                                <label>보류신청</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>요청자:</label>
-                        <input type="text" placeholder="요청자명 입력">
-                    </div>`,
-                'step2': `
-                    <div class="highlight-box">
-                        <h4>신청내역</h4>
-                        <div class="form-group">
-                            <label>신청사유:</label>
-                            <textarea placeholder="고객 등록 사유를 구체적으로 작성해주세요" style="width: 100%; height: 80px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
-                        </div>
-                    </div>`,
-                'step3': `
-                    <div class="highlight-box">
-                        <h4>기본정보</h4>
-                        <div class="form-group">
-                            <label>계정그룹:</label>
-                            <select>
-                                <option>KCOD - 일반고객</option>
-                                <option>KNAT - 법인고객</option>
-                                <option>KPER - 개인고객</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>고객명:</label>
-                            <input type="text" placeholder="정식 회사명 또는 고객명">
-                        </div>
-                        <div class="form-group">
-                            <label>고객단축명:</label>
-                            <input type="text" placeholder="시스템에서 사용할 단축명">
-                        </div>
-                    </div>`,
-                'step4': `
-                    <div class="highlight-box">
-                        <h4>세무정보</h4>
-                        <div class="form-group">
-                            <label>사업자등록번호:</label>
-                            <input type="text" placeholder="000-00-00000">
-                        </div>
-                        <div class="form-group">
-                            <label>대표자명:</label>
-                            <input type="text" placeholder="대표자명 입력">
-                        </div>
-                        <div class="form-group">
-                            <label>업태:</label>
-                            <input type="text" placeholder="업태 입력">
-                        </div>
-                        <div class="form-group">
-                            <label>업종:</label>
-                            <input type="text" placeholder="업종 입력">
-                        </div>
-                        <button style="margin-top: 15px; padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px;">BPM결재요청</button>
-                    </div>`,
-                'step5': `
-                    <div class="highlight-box">
-                        <h4>재무정보</h4>
-                        <div class="form-group">
-                            <label>지급조건:</label>
-                            <select>
-                                <option>Z001 - 즉시결제</option>
-                                <option>Z030 - 30일 후 결제</option>
-                                <option>Z060 - 60일 후 결제</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>가상계좌은행:</label>
-                            <input type="text" value="088 - 신한은행" readonly>
-                        </div>
-                    </div>`,
-                'step6': `
-                    <div class="highlight-box">
-                        <h4>주소 정보</h4>
-                        <div class="form-group">
-                            <label>우편번호:</label>
-                            <input type="text" placeholder="우편번호">
-                            <button style="padding: 6px 12px; background: #0070f3; color: white; border: none; border-radius: 4px; margin-left: 10px;">주소검색</button>
-                        </div>
-                        <div class="form-group">
-                            <label>주소:</label>
-                            <input type="text" placeholder="주소검색 결과">
-                        </div>
-                        <div class="form-group">
-                            <label>상세주소:</label>
-                            <input type="text" placeholder="상세주소 입력">
-                        </div>
-                        <div class="form-group">
-                            <label>전화번호:</label>
-                            <input type="text" placeholder="000-0000-0000">
-                        </div>
-                        <div class="form-group">
-                            <label>E-mail:</label>
-                            <input type="email" placeholder="example@company.com">
-                        </div>
-                    </div>
-                    <div class="section-divider">
-                        <h4>청구지 주소</h4>
-                        <div class="form-group">
-                            <label>우편번호:</label>
-                            <input type="text" placeholder="우편번호">
-                            <button style="padding: 6px 12px; background: #0070f3; color: white; border: none; border-radius: 4px; margin-left: 10px;">주소검색</button>
-                        </div>
-                        <div class="form-group">
-                            <label>청구지 주소:</label>
-                            <input type="text" placeholder="청구서 발송 주소">
-                        </div>
-                        <button style="margin-top: 15px; padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 4px;">BPM 요청</button>
-                    </div>`,
-                'step7': `
-                    <div class="bpm-section">
-                        <h4>📋 BPM 승인 화면</h4>
-                        <div class="form-group">
-                            <label>신청자:</label>
-                            <span>재무회계팀</span>
-                        </div>
-                        <div class="form-group">
-                            <label>신청일자:</label>
-                            <span>${new Date().toLocaleDateString('ko-KR')}</span>
-                        </div>
-                        <div class="form-group">
-                            <label>신청사유:</label>
-                            <span>고객마스터 신규</span>
-                        </div>
-                    </div>
-                    <div class="section-divider">
-                        <h4>첨부서류</h4>
-                        <ul style="margin-left: 20px;">
-                            <li>✅ 사업자등록증</li>
-                            <li>✅ 개인정보 수집이용동의서</li>
-                            <li>✅ 법인인감증명서</li>
-                            <li>📎 구매처 등록서류 (해당시)</li>
-                        </ul>
-                        <button style="margin-top: 15px; padding: 10px 20px; background: #17a2b8; color: white; border: none; border-radius: 4px;">업무처리</button>
-                    </div>`
-            };
-            if (screens[stepId]) {
-                screenElement.innerHTML = screens[stepId];
-            }
-        }
-
-        function updateRevenueScreen(stepId, screenElement) {
-            const today = new Date().toISOString().split('T')[0];
-            const screens = {
-                'step1': `
-                    <div class="highlight-box">
-                        <div class="form-group">
-                            <label>사업자번호:</label>
-                            <input type="text" placeholder="고객 사업자번호 입력">
-                        </div>
-                        <div class="form-group">
-                            <label>전표헤더 텍스트:</label>
-                            <input type="text" placeholder="전표헤더 텍스트 한줄 작성">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>전기일:</label>
-                        <input type="date" value="${today}">
-                    </div>`,
-                'step2': `
-                    <div class="highlight-box">
-                        <h4>개별항목 선택</h4>
-                        <div class="form-group">
-                            <input type="radio" name="billing_type" value="regular" checked>
-                            <label>매월청구수입전표-정기</label>
-                        </div>
-                        <div class="form-group">
-                            <input type="radio" name="billing_type" value="onetime">
-                            <label>1회 청구수입전표-수기</label>
-                        </div>
-                    </div>
-                    <div class="section-divider">
-                        <h4>채권유형</h4>
-                        <div class="form-group">
-                            <input type="radio" name="debt_type" value="sales" checked>
-                            <label>영업수익 (롤링, 보안컨설팅, 구축, 부동산임대수익 등)</label>
-                        </div>
-                        <div class="form-group">
-                            <input type="radio" name="debt_type" value="nonsales">
-                            <label>영업외수익 (임대보증금, 지연이자, 배당수익, 외환차익 등)</label>
-                        </div>
-                    </div>
-                    <button style="margin-top: 15px; padding: 10px 20px; background: #0070f3; color: white; border: none; border-radius: 4px;">실행</button>`,
-                'step3': `
-                    <div class="highlight-box">
-                        <h4>청구내용 입력</h4>
-                        <div class="form-group">
-                            <label>송장 처리일:</label>
-                            <input type="date" value="${today}">
-                            <small style="color: red;">⚠️ 입력일 기준 전월 일자 입력 금지</small>
-                        </div>
-                        <div class="form-group">
-                            <label>금액:</label>
-                            <input type="text" placeholder="VAT포함금액 입력">
-                        </div>
-                        <div class="form-group">
-                            <label>세액:</label>
-                            <input type="text" placeholder="VAT 입력">
-                            <select style="margin-left: 10px;">
-                                <option>AA (과세-내국세-세금계산서)</option>
-                                <option>A0 (면세)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>텍스트:</label>
-                            <input type="text" placeholder="청구 내용 상세 설명">
-                        </div>
-                    </div>`,
-                'step4': `
-                    <div class="highlight-box">
-                        <h4>매출정보 입력</h4>
-                        <div class="form-group">
-                            <label><a href="#" onclick="showGlossary('gl계정')" class="term-link">G/L계정</a>:</label>
-                            <input type="text" placeholder="적정계정 입력">
-                            <small>문의: 경영재무팀 (예산은 경영성과팀)</small>
-                        </div>
-                        <div class="form-group">
-                            <label>전표 통화 표시금액:</label>
-                            <input type="text" placeholder="매출금액(VAT제외)">
-                        </div>
-                        <div class="form-group">
-                            <label>텍스트:</label>
-                            <input type="text" placeholder="매출 설명">
-                        </div>
-                        <div class="form-group">
-                            <label><a href="#" onclick="showGlossary('코스트센터')" class="term-link">코스트센터</a>:</label>
-                            <input type="text" placeholder="예산 매핑된 코스트센터">
-                        </div>
-                        <div class="form-group">
-                            <label><a href="#" onclick="showGlossary('wbs')" class="term-link">WBS</a>:</label>
-                            <input type="text" placeholder="필요시 입력">
-                        </div>
-                        <div class="form-group">
-                            <label><a href="#" onclick="showGlossary('수익성세그먼트')" class="term-link">수익성세그먼트</a>:</label>
-                            <select>
-                                <option>관련 BM에 맞는 수익성 세그먼트 선택</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <button style="padding: 8px 15px; background: #ffc107; color: black; border: none; border-radius: 4px; margin-right: 10px;">시뮬레이션</button>
-                        <button style="padding: 8px 15px; background: #28a745; color: white; border: none; border-radius: 4px;">완료 상태로 저장</button>
-                    </div>`,
-                'step5': `
-                    <div class="highlight-box">
-                        <h4>결재요청 (ZFIRE0092)</h4>
-                        <div class="form-group">
-                            <label>회사코드:</label>
-                            <input type="text" value="1000" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>전표입력 일자 범위:</label>
-                            <input type="date" value="${today}">
-                            <span style="margin: 0 10px;">~</span>
-                            <input type="date" value="${today}">
-                        </div>
-                        <button style="margin-top: 10px; padding: 8px 16px; background: #0070f3; color: white; border: none; border-radius: 4px;">실행</button>
-                    </div>
-                    <div class="section-divider">
-                        <h4>요청내용</h4>
-                        <div style="margin-top: 15px;">
-                            <button style="padding: 10px 15px; background: #17a2b8; color: white; border: none; border-radius: 4px; margin-right: 10px;">상세적요 입력</button>
-                            <button style="padding: 10px 15px; background: #ffc107; color: black; border: none; border-radius: 4px; margin-right: 10px;">가산금 부과 정보 입력</button>
-                        </div>
-                        <div class="form-group" style="margin-top: 15px;">
-                            <label>청구서 발송여부:</label>
-                            <select>
-                                <option>발송</option>
-                                <option>미발송</option>
-                            </select>
-                        </div>
-                        <button style="margin-top: 15px; padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 4px;">BPM 결재요청</button>
-                    </div>`
-            };
-            if (screens[stepId]) {
-                screenElement.innerHTML = screens[stepId];
-            }
-        }
-
-        function updateInvoiceScreen(stepId, screenElement) {
-            const today = new Date().toISOString().split('T')[0];
-            const screens = {
-                'step1': `
-                    <div class="highlight-box">
-                        <div class="form-group">
-                            <label>고객코드:</label>
-                            <input type="text" placeholder="고객코드 입력">
-                        </div>
-                        <div class="form-group">
-                            <label>조회:</label>
-                            <button style="padding: 8px 16px; background: #0070f3; color: white; border: none; border-radius: 4px;">실행</button>
-                        </div>
-                    </div>
-                    <div class="section-divider">
-                        <h4>발행 조회 선택</h4>
-                        <div class="form-group">
-                            <input type="radio" name="query_type" value="sales" checked>
-                            <label>영업수익 청구</label>
-                        </div>
-                        <div class="form-group">
-                            <input type="radio" name="query_type" value="nonsales">
-                            <label>영업외 청구</label>
-                        </div>
-                    </div>`,
-                'step2': `
-                    <div class="highlight-box">
-                        <h4>📊 발행정보 조회 결과</h4>
-                        <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
-                            <thead>
-                                <tr style="background: #f8f9fa;">
-                                    <th style="border: 1px solid #dee2e6; padding: 8px;">전표번호</th>
-                                    <th style="border: 1px solid #dee2e6; padding: 8px;">청구금액</th>
-                                    <th style="border: 1px solid #dee2e6; padding: 8px;">발행일자</th>
-                                    <th style="border: 1px solid #dee2e6; padding: 8px;">상태</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td style="border: 1px solid #dee2e6; padding: 8px;">발송완료</td>
-                                </tr>
-                                <tr>
-                                    <td style="border: 1px solid #dee2e6; padding: 8px;">1600000305</td>
-                                    <td style="border: 1px solid #dee2e6; padding: 8px;">7,160,000</td>
-                                    <td style="border: 1px solid #dee2e6; padding: 8px;">2022.07.12</td>
-                                    <td style="border: 1px solid #dee2e6; padding: 8px;">발송완료</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>`,
-                'step3': `
-                    <div class="highlight-box">
-                        <h4>📧 청구서 재발송</h4>
-                        <div class="form-group">
-                            <label>선택된 청구서:</label>
-                            <span>전표번호: 1600000304</span>
-                        </div>
-                        <div class="form-group">
-                            <label>수신 이메일:</label>
-                            <input type="email" placeholder="customer@company.com">
-                        </div>
-                        <div class="form-group">
-                            <label>발송 내용:</label>
-                            <textarea placeholder="추가 메시지 (선택사항)" style="width: 100%; height: 60px; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"></textarea>
-                        </div>
-                        <button style="margin-top: 15px; padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 4px;">📧 이메일청구서발송</button>
-                    </div>
-                    <div class="section-divider">
-                        <small style="color: #666;">💡 발송 전 이메일 주소를 다시 한번 확인해주세요.</small>
-                    </div>`,
-                'step4': `
-                    <div class="highlight-box">
-                        <h4>📄 PDF 다운로드</h4>
-                        <div class="form-group">
-                            <label>선택된 청구서:</label>
-                            <span>전표번호: 1600000304</span>
-                        </div>
-                        <div class="form-group">
-                            <label>청구금액:</label>
-                            <span>13,208,000원</span>
-                        </div>
-                        <div class="form-group">
-                            <label>발행일자:</label>
-                            <span>2022.07.31</span>
-                        </div>
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <button style="padding: 10px 15px; background: #17a2b8; color: white; border: none; border-radius: 4px; margin-right: 10px;">📄 청구서 발행</button>
-                        <button style="padding: 10px 15px; background: #dc3545; color: white; border: none; border-radius: 4px;">📥 PDF파일 다운로드</button>
-                    </div>
-                    <div class="section-divider">
-                        <small style="color: #666;">💡 PDF 파일은 정식 청구서와 동일한 효력을 가집니다.</small>
-                        <br>
-                        <small style="color: #666;">📁 다운로드된 파일: 청구서_1600000304_20220731.pdf</small>
-                    </div>`
-            };
-            if (screens[stepId]) {
-                screenElement.innerHTML = screens[stepId];
-            }
-        }
-
-        // 페이지 로드시 기본 화면 설정
-        window.onload = function() {
-            hideExposedCode();
-            showMainMenu();
-            setCurrentDate();
-            // 추가로 지연 실행하여 확실히 제거
-            setTimeout(hideExposedCode, 100);
-            setTimeout(hideExposedCode, 500);
-        };
-
-        // 노출된 코드 숨기기 함수 (강화 버전)
-        function hideExposedCode() {
-            // 1. 텍스트 노드 스캔 및 제거
-            const walker = document.createTreeWalker(
-                document.body,
-                NodeFilter.SHOW_TEXT,
-                null,
-                false
-            );
-            
-            const nodesToRemove = [];
-            let node;
-            
-            while (node = walker.nextNode()) {
-                const text = node.textContent.trim();
+            allSections.forEach(section => {
+                const sectionId = section.id;
+                const sectionTitle = section.querySelector('h2').textContent;
+                const substeps = section.querySelectorAll('.substep');
                 
-                // 제거할 패턴들
-                if (text.includes('1600000304') ||
-                    text.includes('전표헤더 텍스트') ||
-                    text.includes('13,208,000') ||
-                    text.includes('2022.07.31') ||
-                    text.includes('function showManual') ||
-                    text.includes('document.getElementById') ||
-                    text.includes('style.display') ||
-                    (text.includes('function') && text.length > 100)) {
-                    nodesToRemove.push(node);
-                }
+                substeps.forEach(substep => {
+                    const substepTitle = substep.querySelector('h3').textContent;
+                    const substepContent = substep.textContent.toLowerCase();
+                    
+                    if (substepContent.includes(query)) {
+                        results.push({
+                            sectionId,
+                            sectionTitle,
+                            substepTitle,
+                            context: getContextAroundMatch(substepContent, query)
+                        });
+                    }
+                });
+            });
+            
+            displaySearchResults(results);
+        }
+        
+        // 검색어 주변 컨텍스트 추출
+        function getContextAroundMatch(content, query) {
+            const index = content.indexOf(query);
+            const start = Math.max(0, index - 50);
+            const end = Math.min(content.length, index + query.length + 50);
+            return '...' + content.substring(start, end) + '...';
+        }
+        
+        // 검색 결과 표시
+        function displaySearchResults(results) {
+            const searchResults = document.getElementById('searchResults');
+            
+            if (results.length === 0) {
+                searchResults.innerHTML = '<div class="search-result"><p style="color: #666; text-align: center; padding: 20px;">검색 결과가 없습니다.</p></div>';
+            } else {
+                searchResults.innerHTML = results.map(result => `
+                    <div class="search-result" onclick="showSection('${result.sectionId}')">
+                        <h4>${result.sectionTitle}</h4>
+                        <h5 style="color: #333; margin-bottom: 10px; font-size: 0.9rem;">${result.substepTitle}</h5>
+                        <p style="color: #666; font-size: 0.8rem;">${result.context}</p>
+                    </div>
+                `).join('');
             }
             
-            // 노드 제거
-            nodesToRemove.forEach(node => {
-                if (node.parentNode) {
-                    node.parentNode.removeChild(node);
+            searchResults.style.display = 'block';
+        }
+        
+        // 코드 복사 기능
+        function setupCodeCopy() {
+            const codes = document.querySelectorAll('.code');
+            codes.forEach(code => {
+                code.addEventListener('click', function() {
+                    navigator.clipboard.writeText(this.textContent).then(() => {
+                        const originalText = this.textContent;
+                        this.textContent = '복사됨!';
+                        this.style.background = '#28a745';
+                        setTimeout(() => {
+                            this.textContent = originalText;
+                            this.style.background = '#2d3748';
+                        }, 1000);
+                    });
+                });
+                
+                code.title = '클릭하여 복사';
+            });
+        }
+        
+        // 키보드 네비게이션
+        function setupKeyboardNavigation() {
+            document.addEventListener('keydown', function(e) {
+                // ESC 키로 검색 결과 숨기기
+                if (e.key === 'Escape') {
+                    const searchResults = document.getElementById('searchResults');
+                    searchResults.style.display = 'none';
+                    document.getElementById('searchInput').blur();
+                }
+                
+                // Ctrl + F로 검색 포커스
+                if (e.ctrlKey && e.key === 'f') {
+                    e.preventDefault();
+                    document.getElementById('searchInput').focus();
                 }
             });
+        }
+        
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            setupSearch();
+            setupCodeCopy();
+            setupKeyboardNavigation();
             
-            // 2. 특정 텍스트가 포함된 요소들 제거
-            const allElements = document.querySelectorAll('*');
-            allElements.forEach(element => {
-                const text = element.textContent;
-                if (element.children.length === 0 && // 자식 요소가 없는 경우만
-                    (text.includes('1600000304') || 
-                     text.includes('전표헤더 텍스트') ||
-                     text.includes('function showManual'))) {
-                    element.style.display = 'none';
-                    element.remove();
+            // 초기 사이드바 활성화
+            updateSidebarActive(currentSection);
+            
+            // 페이드인 애니메이션을 위한 스타일 추가
+            const style = document.createElement('style');
+            style.textContent = `
+                .fade-in-item {
+                    animation: fadeInUp 0.6s ease-out forwards;
+                    opacity: 0;
+                    transform: translateY(20px);
                 }
-            });
-            
-            // 3. body의 직접 자식 중 텍스트 노드 제거
-            Array.from(document.body.childNodes).forEach(node => {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    const text = node.textContent.trim();
-                    if (text.includes('1600000304') || 
-                        text.includes('전표헤더') ||
-                        text.includes('function') ||
-                        text.length > 50) {
-                        node.remove();
+                
+                @keyframes fadeInUp {
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
                     }
                 }
-            });
-        }
-
-        // 키보드 네비게이션 지원
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                showMainMenu();
+                
+                .search-result:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+                }
+                
+                @media print {
+                    .sidebar, .search-container {
+                        display: none !important;
+                    }
+                    
+                    .main-content {
+                        display: block !important;
+                    }
+                    
+                    .content-area {
+                        width: 100% !important;
+                        margin: 0 !important;
+                        padding: 20px !important;
+                        box-shadow: none !important;
+                        background: white !important;
+                    }
+                    
+                    .section {
+                        display: block !important;
+                        page-break-inside: avoid;
+                    }
+                    
+                    .substep {
+                        page-break-inside: avoid;
+                        margin-bottom: 20px;
+                    }
+                    
+                    body {
+                        background: white !important;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+        
+        // 스크롤 시 사이드바 고정
+        window.addEventListener('scroll', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const scrollTop = window.pageYOffset;
+            
+            if (scrollTop > 100) {
+                sidebar.style.position = 'fixed';
+                sidebar.style.top = '20px';
+            } else {
+                sidebar.style.position = 'sticky';
+                sidebar.style.top = '20px';
             }
         });
+        
+        // 반응형 처리
+        function handleResize() {
+            const width = window.innerWidth;
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            
+            if (width <= 768) {
+                sidebar.style.position = 'static';
+                mainContent.style.flexDirection = 'column';
+            } else {
+                mainContent.style.flexDirection = 'row';
+            }
+        }
+        
+        window.addEventListener('resize', handleResize);
+        handleResize(); // 초기 실행
     </script>
 </body>
-</html>;">1600000304</td>
-                                    <td style="border: 1px solid #dee2e6; padding: 8px;">13,208,000</td>
-                                    <td style="border: 1px solid #dee2e6; padding: 8px;">2022.07.31</td>
-                                    <td style="border: 1px solid #dee2e6; padding: 8px" placeholder="고객 사업자번호 입력">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>전표헤더 텍스트:</label>
-                                        <input type="text
+</html>
