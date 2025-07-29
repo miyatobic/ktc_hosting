@@ -1,1 +1,648 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>계정찾기 시스템</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .search-section {
+            padding: 40px;
+            background: #f8f9fa;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 20px 60px 20px 20px;
+            font-size: 18px;
+            border: 3px solid #e9ecef;
+            border-radius: 50px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 24px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .results-section {
+            padding: 0 40px 40px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px 0;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .results-count {
+            font-size: 1.2em;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .clear-btn {
+            padding: 8px 16px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            background: #c0392b;
+            transform: translateY(-1px);
+        }
+
+        .results-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .result-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            border-left: 5px solid #667eea;
+        }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-left-color: #764ba2;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .account-type {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 500;
+            margin-left: auto;
+        }
+
+        .account-main {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .account-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #fff6b3 0%, #fff6b3 100%);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .no-results-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .search-section, .results-section {
+                padding: 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .account-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-buttons {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 계정찾기 시스템</h1>
+            <p>예산계정과 회계계정을 쉽게 검색하고 매핑 관계를 확인하세요</p>
+        </div>
+
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="계정명을 입력하세요 (예: 기타제수당, 국내여비, 통신비 등)">
+                <span class="search-icon">🔍</span>
+            </div>
+            
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">전체</button>
+                <button class="filter-btn" data-filter="budget">예산계정</button>
+                <button class="filter-btn" data-filter="gl">회계계정</button>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <div class="results-header" id="resultsHeader" style="display: none;">
+                <div class="results-count" id="resultsCount"></div>
+                <button class="clear-btn" id="clearBtn">검색 초기화</button>
+            </div>
+            <div id="resultsContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // 회계 데이터 - 전체 119개 데이터 완전 포함
+        const accountData = `대계정	대계정명	통일계정	통일계정명	예산계정	상세계정명	예산통제 여부	G/L계정	GL계정명	PA 필수	GL계정 해설
+51100000T	인건비	51102000F	제수당	51102800F	기타제수당	반기통제	511028000	기타제수당비용		종업원에 대한 상기 이외의 제수당
+51100000T	인건비	51102000F	제수당	51102800F	기타제수당	반기통제	511029000	제수당_국고보조금		국고보조금 차감항목
+51100000T	인건비	51106000F	비급여성복리후생비	51106100F	야식비	반기통제	511061000	야식비	필수	종업원에 대한 교대근무자 간식비 및 특근자 석식비
+51100000T	인건비	51106000F	비급여성복리후생비	51107010F	기관자체포상비	반기통제	511070100	기관장포상비	필수	기관장이 직원 및 유관기관에 지급하는 포상비
+51100000T	인건비	51106000F	비급여성복리후생비	51107020F	본사관리포상비	반기통제	511070200	창안포상비	필수	제안 규정에 따라 지급되는 포상비
+51100000T	인건비	51106000F	비급여성복리후생비	51107020F	본사관리포상비	반기통제	511070300	성과포상비	필수	기업가치 향상에 기여한 기관 및 직원에게 포상하는 비용(품질향상,원가절감,매출증대 등)
+51100000T	인건비	51106000F	비급여성복리후생비	51107010F	기관자체포상비	반기통제	511070400	보로금비용		회사에 공헌한 기관 및 직원의 격려을 위한 비용
+51100000T	인건비	51106000F	비급여성복리후생비	51107020F	본사관리포상비	반기통제	511070500	일반포상비	필수	상기 이외의 각종 포상비
+51200000T	사업경비	51201000F	여비교통비	51201010F	국내여비	반기통제	512010100	국내여비	0	임직원등이 업무수행을 위한 국내출장시 여비규정에 의해 지급하는 제비용
+51200000T	사업경비	51201000F	여비교통비	51201050F	국내여비(BM)	반기통제	512010110	국내여비(BM)	필수	국내여비 중 서비스 직접비 분류 대상 비용(분류임직원등이 업무수행을 위한 국내출장시 여비규정에 의해 지급하는 제비용)
+51200000T	사업경비	51201000F	여비교통비	51201020F	해외여비	반기통제	512010200	해외여비		임직원등이 업무수행을 위한 해외출장시 여비규정에 의해 지급하는 제비용
+51200000T	사업경비	51201000F	여비교통비	51201030F	해외여비(BM)	반기통제	512010300	해외여비(직접비)	필수	해외여비 중 서비스직접비 분류 대상 비용
+51200000T	사업경비	51201000F	여비교통비	51201040F	현장영업활동여비	반기통제	512010310	현장영업활동여비	필수	영업인력들의 업무수행을 위한 국내출장시 여비규정에 의해 지급하는 제비용
+51200000T	사업경비	51202000F	통신비	51202010F	통신비	반기통제	512020100	통신지원비		지급지침에 의해 지급되는 이동통신 이용료의 보조금
+51200000T	사업경비	51202000F	통신비	51202010F	통신비	반기통제	512020300	우편택배비	필수	문서발송 등과 관련하여 발생하는 우편료 및 택배비
+51200000T	사업경비	51202000F	통신비	51202010F	통신비	반기통제	512028000	기타통신비	필수	기외 업무를 위하여 사용하는 통신을 위해 필요한 제비용
+51200000T	사업경비	51206000F	소모품비	51206010F	소모용품비	반기통제	512060100	소모용품비	필수	일반사무용품 구입비(고정자산으로 분류되는 자산, 공기구비품 수리비, 책자 발간비, 판촉물 및 선장품 제작/구입비는 제외) 및 소모용품구입비(예시 : 명함,화분,액자,필터,비누,CI,방석,대외홍보용이 아닌 현수막 등 기관운영에 필요한 소모품, 직원용 생수대금 등)
+51200000T	사업경비	51206000F	소모품비	51206020F	안전보건용품비	반기통제	512060200	안전보건용품비	필수	안전보호구, 점검용품 등 구매 및 수리 비용
+51200000T	사업경비	51206000F	소모품비	51206040F	집기용품비	반기통제	512060400	집기용품비	필수	사무용 책상,의자,탁자,서고,캐비닛,금고,로커,응접세트,칸막이 등
+51200000T	사업경비	51207000F	피복비	51207010F	피복비	반기통제	512070100	의류비	필수	직원 및 계약직을 위하여 지급하는 제복비
+51200000T	사업경비	51207000F	피복비	51207010F	피복비	반기통제	512070200	침구류비	필수	종업원을 위한 침구류 구입비
+51200000T	사업경비	51207000F	피복비	51207030F	세탁비	반기통제	512070300	세탁비	필수	업무용피복세탁비
+51200000T	사업경비	51208000F	도서인쇄비	51208010F	도서인쇄비	반기통제	512080100	도서구입비	필수	각종 도서류 구입비용
+51200000T	사업경비	51208000F	도서인쇄비	51208020F	도서인쇄비(BM)	반기통제	512080200	도서구입비(직접비)	필수	도서구입비 중 서비스직접비 분류 대상 비용
+51200000T	사업경비	51208000F	도서인쇄비	51208010F	도서인쇄비	반기통제	512080300	유인물발간비	필수	각종 간행물, 도서류, 각종보고서등 발간비
+51200000T	사업경비	51208000F	도서인쇄비	51208010F	도서인쇄비	반기통제	512080400	신문/잡지구독비	필수	신문 및 잡지 구독료
+51200000T	사업경비	51208000F	도서인쇄비	51208010F	도서인쇄비	반기통제	512088000	기타도서인쇄비	필수	상기 이외의 도서인쇄비(설계도면 복사비 등 포함)
+51200000T	사업경비	51209000F	임차비	51209040F	기계선로시설임차비	반기통제	512090400	기계시설임차비	필수	기계시설 임차에 따른 제 비용
+51200000T	사업경비	51209000F	임차비	51209070F	차량운반구임차비	반기통제	512090700	차량운반구임차비	필수	차량운반구 임차에 따른 제 비용
+51200000T	사업경비	51209000F	임차비	51209080F	기타임차비	반기통제	512090800	공기구비품임차비	필수	공구기구비품 임차에 따른 제 비용(PC,복사기 등)
+51200000T	사업경비	51209000F	임차비	51209090F	OA렌탈비(BM)	반기통제	512090900	OA 렌탈비(BM)	필수	사무용 집기비품 및 소모품 등에 해당하는 렌탈비용 중 서비스직접비에 해당하는 비용
+51200000T	사업경비	51209000F	임차비	51209170F	리스료비용	반기통제	512091700	리스료비용	필수	리스비용
+51200000T	사업경비	51209000F	임차비	51209180F	임차비(현할자)	반기통제	512092000	임차보증금 현할차	필수	사옥, 기계장치 등 임차보증금에 대하여 잔여사용기간에 대하여 유효이자율로 할인한 현재가치할인차금 상각액
+51200000T	사업경비	51209000F	임차비	51209240F	OA렌탈비	반기통제	512092400	OA 렌탈비	필수	사무용 집기비품 및 소모품 등에 대한 렌탈비용
+51200000T	사업경비	51209000F	임차비	51209080F	기타임차비	반기통제	512098000	기타임차비	필수	상기 이외의 임차에 따른 임차비용
+51200000T	사업경비	51211000F	수선비	51211010F	부동산수선비	반기통제	512110100	건물수선비	필수	건물 수선유지를 위해 직접 투입되는 비용(수리비,철거비,도색비 등)
+51200000T	사업경비	51211000F	수선비	51211020F	부동산수선비(BM)	반기통제	512110200	건물수선비(직접비)	필수	건물수선비 중 서비스직접비 분류 대상 비용
+51200000T	사업경비	51211000F	수선비	51211010F	부동산수선비	반기통제	512110300	구축물수선비	필수	구축물 수선유지를 위해 직접 투입하는 비용(도급비,철거비,도색비 등)
+51200000T	사업경비	51211000F	수선비	51211070F	전원시설수선비	반기통제	512110700	전원시설수선비	필수	전원시설 운용유지를 위해 직접 투입하는 비용중 수익적지출분(이전비,철거비,수리비,소모성물자비 등)
+51200000T	사업경비	51211000F	수선비	51211090F	안전보건수선비	반기통제	512110900	안전보건수선비(직접비)	필수	안전난간설치 및 수리, 사다리 등받이 설치 등 자산으로 편입되는 건축물 및 건축물에 귀속되는 시설의 재해 예방을 위한 비용
+51200000T	사업경비	51211000F	수선비	51211020F	부동산수선비(BM)	반기통제	512111000	기계시설수선비	필수	기계시설의 수선유지를 위해 직접 투입되는 비용
+51200000T	사업경비	51211000F	수선비	51211110F	시설자재비	반기통제	512111100	시설자재비	필수	운영시설의 수선 시 사용되는 부품 구매비용(케이블, DISC, GBIC 등)
+51200000T	사업경비	51211000F	수선비	51211130F	공기구비품수선비	반기통제	512111300	공기구비품수선비	필수	공기구비품 운용유지를 위해 직접 투입하는 비용중 수익적지출분(수리비,소모성물자비 등)
+51200000T	사업경비	51211000F	수선비	51211160F	긴급출동보전비	반기통제	512111600	긴급출동보전비		통신장애 발생 및 시스템버젼업 작업 등 근무시간외의작업 출동시 소요되는 경비(긴급출동보전비,식비,간식비,교통비등)
+51200000T	사업경비	51211000F	수선비	51211120F	기타수선비	반기통제	512112100	저장품평가손실	필수	저장품의 시가가 장부가액 이하로 하락한 경우에는 시가와 장부가액과의 차이인 평가손실
+51200000T	사업경비	51211000F	수선비	51211220F	방화시설수선비	반기통제	512112200	방화시설수선비	필수	건물 및 구축물 화재예방과 소방업무상 소요되는 법적점검과 소발시설 및 입주환경에 대한 긴급성, 현장성 수선유지 시 소요되는 비용
+51200000T	사업경비	51211000F	수선비	51211120F	기타수선비	반기통제	512118100	기타시설수선비	필수	상기 이외의 수선유지비
+51200000T	사업경비	51213000F	차량유지비	51213010F	차량유지비	반기통제	512130100	차량유류비	필수	차량유지에 소요되는 유류비
+51200000T	사업경비	51213000F	차량유지비	51213010F	차량유지비	반기통제	512130200	자동차세비용	필수	지방세법에 의해 납부하는 자동차세, 면허세
+51200000T	사업경비	51213000F	차량유지비	51213030F	자가운전보조비	반기통제	512130300	자가운전보조비	필수	지급지침에 따라 종사원의 자가운전시 지급되는 차량유지비 (유류비 포함)
+51200000T	사업경비	51213000F	차량유지비	51213010F	차량유지비	반기통제	512138000	기타차량비	필수	상기 이외의 차량비(차량 탁송비, 인수 여비, CI도색비제외)
+51200000T	사업경비	51214000F	보험비	51214010F	임원책임배상보험료	반기통제	512140100	임원책임배상보험비	필수	임원의 책임배상보험료
+51200000T	사업경비	51214000F	보험비	51214020F	화재보험료	반기통제	512140200	화재보험비	필수	유형자산(차량운반구 제외)에 대한 화재보험료등의 손해보험료(회계규정 참고)
+51200000T	사업경비	51214000F	보험비	51214030F	기타보험료	반기통제	512140300	보증보험비	필수	종사원에 대한 보증보험료
+51200000T	사업경비	51214000F	보험비	51214060F	차량보험료	반기통제	512140600	차량보험비	필수	차량운반구(렌탈차량 제외)에 대한 보험료(책임보험, 종합보험,운전자보험등)
+51200000T	사업경비	51214000F	보험비	51214030F	기타보험료	반기통제	512148000	기타보험비	필수	상기 이외의 보험료
+51200000T	사업경비	51215000F	지급수수료비용	51215310F	지급수수료	반기통제	512150100	위탁용역수수료	필수	법무/회계법인/미화 등 경영기획본부 및 CEO 직속조직에서 집행하는 외부 용역 관련 수수료에 한하여 집행(IT제외)
+51200000T	사업경비	51215000F	지급수수료비용	51215020F	지급수수료(BM)	반기통제	512150200	위탁용역수수료(직접비)	필수	FM/안내반출입/운용지원/네트워크유지보수 수수료 및 Cloud/IDC본부 소속부서에서 집행하는 외부 용역 관련 수수료(IT제외)
+51200000T	사업경비	51215000F	지급수수료비용	51215070F	IT유지보수비	반기통제	512150700	IT유지보수비(간접비)	필수	경영기획본부 및 CEO 직속 부서에서 당사의 IT업무를 위탁하는 대가로 지급하는 IT아웃소싱(ITO/MA/개발) 비용
+51200000T	사업경비	51215000F	지급수수료비용	51215080F	IT유지보수비(BM)	반기통제	512150800	IT유지보수비(직접비)	필수	Cloud/IDC본부 소속 부서에서 당사의 IT업무를 위탁하는 대가로 지급하는 IT아웃소싱(ITO/MA/개발) 비용
+51200000T	사업경비	51215000F	지급수수료비용	51215180F	안전보건운영수수료	반기통제	512151800	안전보건운영수수료(직접비)	필수	재해예방기술지도비, 건축물 및 공사 각종 설비 관련 점검/검사 용역비용(법정의무 검사 제외)
+51200000T	사업경비	51215000F	지급수수료비용	51215190F	금융수수료	반기통제	512151900	금융수수료	필수	각종 금융용역에 대한 수수료(은행수납수수료,홈뱅킹,펌뱅킹 등)
+51200000T	사업경비	51215000F	지급수수료비용	51215240F	기타계약직수수료	반기통제	512152400	기타계약직수수료	필수	상기이외의 인력공급업체에 업무위탁에 따른 수수료
+51200000T	사업경비	51215000F	지급수수료비용	51215020F	지급수수료(BM)	반기통제	512152600	사업수수료(직접비)	필수	지급수수료 중 사업과 관련된 직접비 성격의 수수료비용
+51200000T	사업경비	51215000F	지급수수료비용	51215020F	지급수수료(BM)	반기통제	512152700	기타수수료비용(직접비)	필수	Cloud/IDC본부 소속부서에서 집행하는 非용역 수수료 집행
+51200000T	사업경비	51215000F	지급수수료비용	51215310F	지급수수료	반기통제	512153100	감정비	필수	감정평가에 대하여 지급하는 수수료
+51200000T	사업경비	51215000F	지급수수료비용	51215320F	법정수수료	반기통제	512153200	법정수수료	필수	법정수수료
+51200000T	사업경비	51215000F	지급수수료비용	51215310F	지급수수료	반기통제	512153400	제증명수수료비용	필수	국가 및 지방자치단체가 발급하는 각종증명서류의 수수료
+51200000T	사업경비	51215000F	지급수수료비용	51215350F	안전보건운영 용역수수료	반기통제	512153500	안전보건운영 용역수수료	필수	안전보건관리 위탁수수료,. 작업환경 측정 등 종사자의 재해예방을 위한 점검/검사 용역비용(법정의무 검사 포함)
+51200000T	사업경비	51215000F	지급수수료비용	51215310F	지급수수료	반기통제	512153700	IP사용수수료비용	필수	인터넷 주소(IP) 사용에 따른 수수료
+51200000T	사업경비	51215000F	지급수수료비용	51215390F	라이센스 수수료(BM)	반기통제	512153900	라이센스 수수료(직접비)	필수	라이센스 수수료나 각종 소프트웨어 사용에 따른 라이센스 수수료비용
+51200000T	사업경비	51215000F	지급수수료비용	51215400F	라이센스 수수료	반기통제	512154000	라이센스 수수료	필수	라이센스 수수료나 각종 소프트웨어 사용에 따른 라이센스 수수료비용
+51200000T	사업경비	51215000F	지급수수료비용	51215410F	사업수수료(간접비)	반기통제	512154100	사업수수료(간접비)	필수	사업 운영 및 유지관리를 위해 지출된 비용
+51200000T	사업경비	51215000F	지급수수료비용	51215310F	지급수수료	반기통제	512158000	기타수수료비용	필수	VAN수수료/브랜드수수료/채권추심수수료 및 경영기획본부 및 CEO 직속조직에서 집행하는 非용역 수수료
+51200000T	사업경비	51215000F	지급수수료비용	51215020F	지급수수료(BM)	반기통제	512158010	선임지원수수료	필수	
+51200000T	사업경비	51217000F	업무추진비	51217010F	업무추진비	반기통제	512170100	접대비		신용카드, 세금계산서, 계산서로 지급하는 접대비중건당 3만원 초과분
+51200000T	사업경비	51217000F	업무추진비	51217020F	업무추진비(BM)	반기통제	512170500	업무추진비(BM)		업무추진비 중 서비스 직접비 분류 대상 비용
+51200000T	사업경비	51218000F	광고선전비	51218010F	기업광고비	반기통제	512180100	매체기업광고비		기업홍보를 위해소요되는 제비용(제작료등 포함)
+51200000T	사업경비	51218000F	광고선전비	51218010F	기업광고비	반기통제	512180200	옥외기업광고비		기업홍보를 위해 옥외에 광고를 위해 소요되는 제비용(제작료등 포함)
+51200000T	사업경비	51218000F	광고선전비	51218010F	기업광고비	반기통제	512180300	협찬기업광고비		기업홍보를 위해 협찬광고에 소요되는 제비용(제작료등 포함)
+51200000T	사업경비	51218000F	광고선전비	51218010F	기업광고비	반기통제	512180400	기타기업광고비		상기 이외의 기업홍보를 위해 소요되는 제비용(제작료등 포함, 영업부서이외의 홍보성 현수막 및 팜플렛)
+51200000T	사업경비	51218000F	광고선전비	51218050F	상품광고비	반기통제	512180500	매체상품광고비		상품광고를 위해 소요되는 제비용(제작료등 포함)
+51200000T	사업경비	51218000F	광고선전비	51218090F	기업광고비(스포츠)	반기통제	512180900	기업광고비(스포츠 등)		스포츠 마케팅을 통한 광고선전을 목적으로 지출된 직접 비용※ 스포츠를 통한 광고비는 다른 광고비계정에 우선하여 본 계정을 적용함(광고물제작비 및 광고매체비 제외)( 스포츠선수에 대한 계약금,연봉 및 상금, 사전약정에 의해 지원하는 숙박,교통,피복,활동비, 회사가 주관(주최) 혹은 협찬하는 공식 스포츠행사에 소요된 상금, 협찬금)
+51200000T	사업경비	51219000F	교육훈련비	51219040F	안전보건교육훈련비	반기통제	512190400	안전보건교육훈련비		근로자 정기 안전교육, 직무교육 등 비용
+51200000T	사업경비	51219000F	교육훈련비	51219050F	직장내교육비	반기통제	512190500	직장내교육비		직장내 자체교육시 소요되는 제경비(강사초빙료/OJT교재구입비/활동비) 및 현장교육참여를 위한 출장비
+51200000T	사업경비	51219000F	교육훈련비	51219800F	기타교육훈련비	반기통제	512190700	직무계발비		직무역량강화 활동을 위한 지원비
+51200000T	사업경비	51219000F	교육훈련비	51219090F	안전보건행사비	반기통제	512190900	안전보건행사비		비상사태 대응훈련, 안전보건 우수사례 포상, 안저보건캠페인 등 비용
+51200000T	사업경비	51219000F	교육훈련비	51219110F	핵심인재 교육훈련비	반기통제	512191100	핵심인재 교육훈련비		Cloud본부 내 교육프로젝트 예산을 별도로 관리하기 위함
+51200000T	사업경비	51219000F	교육훈련비	51219800F	기타교육훈련비	반기통제	512198000	기타교육훈련비		정규교육과정 외 자기계발프로그램/학습지원/교육연구/개선활동을 위한 비용 (학습공동체활동비/자격취득지원비 포함)
+51200000T	사업경비	51220000F	조사분석비	51220800F	기타조사분석비	반기통제	512208000	기타조사분석비		상기 이외의 조사분석비
+51200000T	사업경비	51221000F	등기소송비	51221010F	등기소송비	반기통제	512210100	등기비		각종 등기에 소요되는 제비용(체납관련 압류 소송에 소요되는 인지세 등)
+51200000T	사업경비	51221000F	등기소송비	51221010F	등기소송비	반기통제	512210200	소송비		각종 소송에 소요되는 제비용(공탁금 제외)
+51200000T	사업경비	51221000F	등기소송비	51221030F	법률자문비	반기통제	512210300	법률자문비		법률자문에 소요되는 제비용(변호사 및 공인노무사 선임료 등)
+51200000T	사업경비	51221000F	등기소송비	51221040F	지적재산권관리비	반기통제	512210400	지식재산권관리비		각종 지식재산권 관리에 소요되는 제비용
+51200000T	사업경비	51222000F	협회비	51222010F	협회비	반기통제	512220100	협회정기회비		회사가 가입한 각종 협회의 정기 회비
+51200000T	사업경비	51222000F	협회비	51222010F	협회비	반기통제	512220200	협회특별회비		회사가 가입한 각종 협회의 특별 회비
+51200000T	사업경비	51222000F	협회비	51222010F	협회비	반기통제	512220300	협회신규가입비		회사가 각종 협회에 신규가입시 발생되는 제비용
+51200000T	사업경비	51222000F	협회비	51222010F	협회비	반기통제	512228000	기타협회비		상기 이외의 협회비
+51200000T	사업경비	51223000F	보상비	51223010F	보상비	반기통제	512230100	소송배상금		소송배상비용 (법원 판결에서 정해진 금액)
+51200000T	사업경비	51223000F	보상비	51223010F	보상비	반기통제	512230200	일반피해보상금		상기 이외의 피해보상금(소비자피해 보상규정 등 일반적인 피해보상 법률 또는 사업부서에서 정한기준에 의함)
+51200000T	사업경비	51224000F	경상연구비	51224010F	자체경상연구비	반기통제	512240110	경상연구국내여비_국책과제		국책과제 사업계획서상 비용(정부보조금 지원 항목)
+51200000T	사업경비	51224000F	경상연구비	51224010F	자체경상연구비	반기통제	512240210	경상연구해외여비_국책과제		국책과제 사업계획서상 비용(정부보조금 지원 항목)
+51200000T	사업경비	51224000F	경상연구비	51224010F	자체경상연구비	반기통제	512240310	경상연구활동비_국책과제		국책과제 사업계획서상 비용(정부보조금 지원 항목)
+51200000T	사업경비	51224000F	경상연구비	51224010F	자체경상연구비	반기통제	512240410	경상연구회의비_국책과제		국책과제 사업계획서상 비용(정부보조금 지원 항목)
+51200000T	사업경비	51224000F	경상연구비	51224050F	위탁경상연구비	반기통제	512240510	경상연구용역비_국책과제		국책과제 사업계획서상 비용(정부보조금 지원 항목)
+51200000T	사업경비	51224000F	경상연구비	51224010F	자체경상연구비	반기통제	512248010	기타경상연구비_국책과제		국책과제 사업계획서상 비용(정부보조금 지원 항목)
+51200000T	사업경비	51227000F	잡비	51227010F	부서운영비	반기통제	512270100	부서운영비		부서내 업무활성화를 위한 경비(부서장 주재 회의,발대식,경영설명회 등에 소요되는 음료수,다과,식비 등)
+51200000T	사업경비	51227000F	잡비	51227050F	부서운영비(BM)	반기통제	512270110	부서운영비(BM)		부서내 업무활성화를 위한 경비 중 직접비 처리(부서장 주재 회의,발대식,경영설명회 등에 소요되는 음료수,다과,식비 등)
+51200000T	사업경비	51227000F	잡비	51227040F	매칭그랜트비	반기통제	512270400	매칭그랜트비		임직원이 모금한 사랑나눔기금에 해당하는 금액만큼 회사가 대외봉사활동을 위하여 지원하는 비용
+51600000T	판매비	51601000F	유지판촉비	51601110F	유지판촉비	반기통제	516011100	유지판촉비		BM본부 외 조직에서 고객대상 판촉활동에 소요되는 비용
+51600000T	판매비	51601000F	유지판촉비	51601120F	유지판촉비(BM)	반기통제	516011200	유지판촉비(유선_직접비)		BM본부 조직에서 고객대상 판촉활동에 소요되는 비용
+51600000T	판매비	51602000F	획득판매비	51601510F	획득판촉비	반기통제	516015100	획득판촉비		신규고객 획득을 위한 판매촉진비
+51600000T	판매비	51601100F	유지판매수수료	51602010F	유지판매수수료	반기통제	516020100	유지수수료(유선_일반)		기존고객 유지에 소요되는 판매수수료
+51600000T	판매비	51602000F	획득판매비	51602210F	획득판매수수료	반기통제	516022100	획득수수료(유선)		신규고객 획득에 소요되는 판매수수료
+51700000T	기타영업비용	51703000F	기부금비용	51703010F	사내근로복지기금기부금비용	반기통제	517030100	사내근로복지기금기부금비용		종업원의 복지증진을 위하여 사내근로복지기금법에 의한 사내근로복지기금에 기부한 금액
+51700000T	기타영업비용	51703000F	기부금비용	51703020F	법정기부금비용	반기통제	517030200	법정기부금비용		법인세법에서 규정한 기부금(국가 및 지방자치단체에 기부한 금액, 국방헌금과 국국장병위문금품의 가액, 천재·지변으로 생긴 이재민을 위한 구호금품의 가액)
+51700000T	기타영업비용	51703000F	기부금비용	51703030F	조세특례지정기부금비용	반기통제	517030300	조세특례지정기부금비용		조세특례제한법에서 규정한 기부금(정치자금에관한법률에 의하여 정당 또는 후원회에 기부한 정치자금등)
+51700000T	기타영업비용	51703000F	기부금비용	51703040F	일반지정기부금비용	반기통제	517030400	일반지정기부금비용		사회복지·문화·예술·교육·종교·자선 등 공익성이많은 부분에 지출한 기부금(법인세법시행령 제36조에 열거된 항목)
+51700000T	기타영업비용	51703000F	기부금비용	51703050F	비지정기부금비용	반기통제	517030500	비지정기부금비용		상기이외 기부금`;
+
+        // TSV 데이터를 파싱하는 함수
+        function parseAccountData(tsvData) {
+            const lines = tsvData.trim().split('\n');
+            const headers = lines[0].split('\t');
+            const data = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split('\t');
+                const row = {};
+                headers.forEach((header, index) => {
+                    row[header] = values[index] || '';
+                });
+                data.push(row);
+            }
+            return data;
+        }
+
+        // 파싱된 데이터
+        const parsedData = parseAccountData(accountData);
+
+        let currentFilter = 'all';
+        let searchTimeout;
+
+        // DOM 요소들
+        const searchInput = document.getElementById('searchInput');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const resultsHeader = document.getElementById('resultsHeader');
+        const resultsCount = document.getElementById('resultsCount');
+        const clearBtn = document.getElementById('clearBtn');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+
+        // 이벤트 리스너
+        searchInput.addEventListener('input', handleSearch);
+        clearBtn.addEventListener('click', clearSearch);
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                handleSearch();
+            });
+        });
+
+        // 검색 함수
+        function handleSearch() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                const query = searchInput.value.trim();
+                
+                if (query === '') {
+                    showInitialState();
+                    return;
+                }
+
+                showLoading();
+                
+                setTimeout(() => {
+                    const results = searchAccounts(query);
+                    displayResults(results, query);
+                }, 300);
+            }, 300);
+        }
+
+        // 계정 검색 로직
+        function searchAccounts(query) {
+            const searchTerm = query.toLowerCase();
+            
+            return parsedData.filter(item => {
+                const budgetAccount = (item['상세계정명'] || '').toLowerCase();
+                const glAccount = (item['GL계정명'] || '').toLowerCase();
+                const description = (item['GL계정 해설'] || '').toLowerCase();
+                
+                const matchesBudget = budgetAccount.includes(searchTerm);
+                const matchesGL = glAccount.includes(searchTerm);
+                const matchesDescription = description.includes(searchTerm);
+                
+                const hasMatch = matchesBudget || matchesGL || matchesDescription;
+                
+                if (currentFilter === 'budget') {
+                    return matchesBudget;
+                } else if (currentFilter === 'gl') {
+                    return matchesGL || matchesDescription;
+                } else {
+                    return hasMatch;
+                }
+            });
+        }
+
+        // 결과 표시
+        function displayResults(results, query) {
+            if (results.length === 0) {
+                showNoResults(query);
+                return;
+            }
+
+            resultsHeader.style.display = 'flex';
+            resultsCount.textContent = `${results.length}개의 계정을 찾았습니다`;
+
+            let html = '<div class="results-grid">';
+            
+            results.forEach(item => {
+                html += createResultCard(item, query);
+            });
+            
+            html += '</div>';
+            resultsContainer.innerHTML = html;
+        }
+
+        // 결과 카드 생성
+        function createResultCard(item, query) {
+            const budgetAccountHighlighted = highlightText(item['상세계정명'] || '', query);
+            const glAccountHighlighted = highlightText(item['GL계정명'] || '', query);
+            const descriptionHighlighted = highlightText(item['GL계정 해설'] || '', query);
+            
+            return `
+                <div class="result-card">
+                    <div class="result-header">
+                        <div class="account-main">${budgetAccountHighlighted} ↔ ${glAccountHighlighted}</div>
+                        <div class="account-type">${item['대계정명'] || ''}</div>
+                    </div>
+                    <div class="account-details">
+                        <div class="detail-item">
+                            <div class="detail-label">예산계정 코드</div>
+                            <div class="detail-value">${item['예산계정'] || ''}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">회계계정 코드</div>
+                            <div class="detail-value">${item['G/L계정'] || ''}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">통일계정명</div>
+                            <div class="detail-value">${item['통일계정명'] || ''}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">예산통제</div>
+                            <div class="detail-value">${item['예산통제 여부'] || ''}</div>
+                        </div>
+                    </div>
+                    ${item['GL계정 해설'] ? `
+                        <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #e9ecef;">
+                            <div class="detail-label">계정 설명</div>
+                            <div style="color: #495057; line-height: 1.5; margin-top: 5px;">
+                                ${descriptionHighlighted}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // 텍스트 하이라이트
+        function highlightText(text, query) {
+            if (!query || !text) return text;
+            
+            const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            return text.replace(regex, '<span class="highlight">$1</span>');
+        }
+
+        // 로딩 상태 표시
+        function showLoading() {
+            resultsContainer.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div>검색 중...</div>
+                </div>
+            `;
+            resultsHeader.style.display = 'none';
+        }
+
+        // 검색 결과 없음 표시
+        function showNoResults(query) {
+            resultsContainer.innerHTML = `
+                <div class="no-results">
+                    <div class="no-results-icon">🔍</div>
+                    <h3 style="margin-bottom: 10px;">검색 결과가 없습니다</h3>
+                    <p>"<strong>${query}</strong>"와 일치하는 계정을 찾을 수 없습니다.</p>
+                    <p style="margin-top: 10px; color: #95a5a6;">다른 검색어를 시도해보세요.</p>
+                </div>
+            `;
+            resultsHeader.style.display = 'none';
+        }
+
+        // 초기 상태 표시
+        function showInitialState() {
+            resultsContainer.innerHTML = `
+                <div class="no-results">
+                    <div class="no-results-icon">💼</div>
+                    <h3 style="margin-bottom: 15px;">계정 검색 시스템에 오신 것을 환영합니다</h3>
+                    <p style="margin-bottom: 10px;">🔸 <strong>예산계정</strong> 검색: 상세계정명으로 검색하여 연결된 회계계정을 확인</p>
+                    <p style="margin-bottom: 10px;">🔸 <strong>회계계정</strong> 검색: GL계정명으로 검색하여 연결된 예산계정을 확인</p>
+                    <p style="color: #95a5a6;">위 검색창에 계정명을 입력해주세요</p>
+                </div>
+            `;
+            resultsHeader.style.display = 'none';
+        }
+
+        // 검색 초기화
+        function clearSearch() {
+            searchInput.value = '';
+            currentFilter = 'all';
+            filterBtns.forEach(btn => btn.classList.remove('active'));
+            filterBtns[0].classList.add('active');
+            showInitialState();
+        }
+
+        // 초기 상태 설정
+        showInitialState();
+
+        // 엔터키 검색 지원
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleSearch();
+            }
+        });
+    </script>
+</body>
+</html>
